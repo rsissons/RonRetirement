@@ -122,13 +122,21 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
       currentRoth *= (1 + config.monthlyReturn);
       
       const pension = currentPension;
-      const wifeSalary = currentAge === 59 ? config.wifeSalaryAt59 : 0;
-      const wifeSS = currentAge >= 61 ? config.wifeSSAt61 : 0;
-      const yourSS = currentAge >= 62 ? config.yourSSAt62 : 0;
+      
+      // Wife works for specific years
+      const wifeSalary = year < config.wifeSalaryYears ? config.wifeSalary : 0;
+      
+      // Wife SS starts
+      const wifeSS = currentAge >= config.wifeSSStartAge ? config.wifeSS : 0;
+      
+      // Your SS starts
+      const yourSS = currentAge >= config.yourSSStartAge ? config.yourSS : 0;
+      
       const totalIncome = pension + wifeSalary + wifeSS + yourSS;
       
       const spending = currentSpending;
-      const insurance = currentAge <= 61 ? config.insuranceUntil61 : 0;
+      // Insurance stops when you reach the end age
+      const insurance = currentAge < config.insuranceEndAge ? config.insurancePremium : 0;
       const totalExpenses = spending + insurance;
       
       const gap = totalExpenses > totalIncome ? totalExpenses - totalIncome : 0;

@@ -6,10 +6,11 @@ import { Overview } from './components/Overview';
 import { IncomeBreakdown } from './components/IncomeBreakdown';
 import { FundingSource } from './components/FundingSource';
 import { AccountBalances } from './components/AccountBalances';
+import { DataTable } from './components/DataTable';
 import { StressTest } from './components/StressTest';
-import { LayoutDashboard, PieChart, Layers, LineChart as LineChartIcon, SlidersHorizontal } from 'lucide-react';
+import { LayoutDashboard, PieChart, Layers, LineChart as LineChartIcon, SlidersHorizontal, TableProperties } from 'lucide-react';
 
-type Tab = 'overview' | 'income' | 'funding' | 'balances' | 'stress';
+type Tab = 'overview' | 'income' | 'funding' | 'balances' | 'data' | 'stress';
 
 function App() {
   const [config, setConfig] = useState<AppConfig>(defaultConfig);
@@ -22,6 +23,7 @@ function App() {
     { id: 'income', label: 'Income Breakdown', icon: PieChart },
     { id: 'funding', label: 'Funding Source', icon: Layers },
     { id: 'balances', label: 'Account Balances', icon: LineChartIcon },
+    { id: 'data', label: 'Data Table', icon: TableProperties },
     { id: 'stress', label: 'Stress Test', icon: SlidersHorizontal },
   ] as const;
 
@@ -76,6 +78,7 @@ function App() {
             {activeTab === 'income' && <IncomeBreakdown projection={projection} />}
             {activeTab === 'funding' && <FundingSource projection={projection} />}
             {activeTab === 'balances' && <AccountBalances projection={projection} />}
+            { activeTab === 'data' && <DataTable projection={projection} /> }
             {activeTab === 'stress' && <StressTest config={config} setConfig={setConfig} />}
           </div>
         </main>

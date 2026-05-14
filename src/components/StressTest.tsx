@@ -12,7 +12,7 @@ export const StressTest: FC<Props> = ({ config, setConfig }) => {
     let numValue = parseFloat(value);
     
     // Convert percentages to decimals for the config state
-    if (name === 'annualReturn' || name === 'spendingInflation') {
+    if (name === 'annualReturn' || name === 'spendingInflation' || name === 'pensionCOLA') {
       numValue = numValue / 100;
     }
 
@@ -39,16 +39,12 @@ export const StressTest: FC<Props> = ({ config, setConfig }) => {
             type="range" 
             name="annualReturn"
             min="4" 
-            max="8" 
+            max="10" 
             step="0.1" 
             value={config.annualReturn * 100} 
             onChange={handleChange}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
           />
-          <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>4%</span>
-            <span>8%</span>
-          </div>
         </div>
 
         <div className="mb-8">
@@ -59,17 +55,30 @@ export const StressTest: FC<Props> = ({ config, setConfig }) => {
           <input 
             type="range" 
             name="spendingInflation"
-            min="2" 
-            max="4" 
+            min="1" 
+            max="6" 
             step="0.1" 
             value={config.spendingInflation * 100} 
             onChange={handleChange}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600"
           />
-          <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>2%</span>
-            <span>4%</span>
-          </div>
+        </div>
+        
+        <div className="mb-8">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex justify-between">
+            <span>Pension COLA</span>
+            <span className="font-bold text-emerald-600">{(config.pensionCOLA * 100).toFixed(1)}%</span>
+          </label>
+          <input 
+            type="range" 
+            name="pensionCOLA"
+            min="0" 
+            max="4" 
+            step="0.1" 
+            value={config.pensionCOLA * 100} 
+            onChange={handleChange}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+          />
         </div>
 
         <div className="mb-8">
@@ -87,10 +96,23 @@ export const StressTest: FC<Props> = ({ config, setConfig }) => {
             onChange={handleChange}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
           />
-          <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>$0</span>
-            <span>$10,000</span>
-          </div>
+        </div>
+        
+        <div className="mb-8">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex justify-between">
+            <span>Starting Pension (Monthly)</span>
+            <span className="font-bold text-indigo-600">${config.pensionStart}</span>
+          </label>
+          <input 
+            type="range" 
+            name="pensionStart"
+            min="8000" 
+            max="14000" 
+            step="100" 
+            value={config.pensionStart} 
+            onChange={handleChange}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+          />
         </div>
         
       </div>
