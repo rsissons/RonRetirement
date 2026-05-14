@@ -12,7 +12,7 @@ export const StressTest: FC<Props> = ({ config, setConfig }) => {
     let numValue = parseFloat(value);
     
     // Convert percentages to decimals for the config state
-    if (name === 'annualReturn' || name === 'spendingInflation' || name === 'pensionCOLA') {
+    if (name === 'annualReturn' || name === 'spendingInflation' || name === 'pensionCOLA' || name === 'effectiveTaxRate') {
       numValue = numValue / 100;
     }
 
@@ -81,6 +81,57 @@ export const StressTest: FC<Props> = ({ config, setConfig }) => {
           />
         </div>
 
+        <div className="mb-8">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex justify-between">
+            <span>Essential Spending (Monthly)</span>
+            <span className="font-bold text-gray-900">${config.essentialSpending}</span>
+          </label>
+          <input 
+            type="range" 
+            name="essentialSpending"
+            min="5000" 
+            max="20000" 
+            step="100" 
+            value={config.essentialSpending} 
+            onChange={handleChange}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gray-600"
+          />
+        </div>
+
+        <div className="mb-8">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex justify-between">
+            <span>Discretionary Spending (Monthly)</span>
+            <span className="font-bold text-pink-600">${config.discretionarySpending}</span>
+          </label>
+          <input 
+            type="range" 
+            name="discretionarySpending"
+            min="0" 
+            max="10000" 
+            step="100" 
+            value={config.discretionarySpending} 
+            onChange={handleChange}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-pink-600"
+          />
+        </div>
+        
+        <div className="mb-8">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex justify-between">
+            <span>Effective Tax Rate</span>
+            <span className="font-bold text-amber-600">{(config.effectiveTaxRate * 100).toFixed(1)}%</span>
+          </label>
+          <input 
+            type="range" 
+            name="effectiveTaxRate"
+            min="0" 
+            max="35" 
+            step="0.5" 
+            value={config.effectiveTaxRate * 100} 
+            onChange={handleChange}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-600"
+          />
+        </div>
+        
         <div className="mb-8">
           <label className="block text-sm font-medium text-gray-700 mb-2 flex justify-between">
             <span>Max Monthly Roth Conversion</span>

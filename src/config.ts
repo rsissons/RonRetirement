@@ -18,8 +18,11 @@ export interface AppConfig {
   yourSSStartAge: number; // YOUR age when your SS starts
   
   // Expenses
-  spendingStart: number;
+  essentialSpending: number;
+  discretionarySpending: number;
   spendingInflation: number;
+  
+  effectiveTaxRate: number; // e.g., 0.12 for 12% effective tax on taxable income
   
   rothExtraWithdrawal: number; // Discretionary annual Roth withdrawal
   
@@ -54,8 +57,11 @@ export const defaultConfig: AppConfig = {
   yourSS: 2250,
   yourSSStartAge: 62,
   
-  spendingStart: 13000,
+  essentialSpending: 10000,
+  discretionarySpending: 3000,
   spendingInflation: 0.03,
+  
+  effectiveTaxRate: 0.12,
   
   rothExtraWithdrawal: 0,
   

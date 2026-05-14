@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 import type { ProjectionResult } from '../projection';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { ShieldCheck, Target, TrendingUp } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface Props {
   projection: ProjectionResult;
@@ -10,159 +9,225 @@ interface Props {
 const formatCurrency = (value: number) => 
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 
+const formatCompact = (value: number) => 
+  new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", maximumFractionDigits: 1 }).format(value);
+
 export const Overview: FC<Props> = ({ projection }) => {
   const firstYear = projection.yearly[0];
   const firstMonth = firstYear.months[0];
   
-  // Data for Asset Allocation
-  const assetData = [
-    { name: '403b', value: firstMonth.balance403b, color: '#15325b' },
-    { name: 'Roth', value: firstMonth.balanceRoth, color: '#f97316' },
-  ].filter(d => d.value > 0);
-  
-  // If no assets yet, just show a blank or default
-  if (assetData.length === 0) {
-    assetData.push({ name: 'Empty', value: 1, color: '#e5e7eb' });
-  }
+  // Secure Income Score: (Guaranteed Income / Essential Expenses)
+  const secureIncome = firstYear.totalPension + firstYear.totalWifeSalary + firstYear.totalWifeSS + firstYear.totalYourSS;
+  const secureIncomeScore = Math.min(100, (secureIncome / firstYear.totalEssentialSpending) * 100);
 
-  // Calculate goal achieved roughly based on Roth balance at 85 vs a 1M goal
-  const goalTarget = 1000000;
-  const goalAchievedPct = Math.min(100, Math.max(0, (projection.metrics.rothBalanceAt85 / goalTarget) * 100));
-  
-  const goalData = [
-    { name: 'Achieved', value: goalAchievedPct, color: '#f97316' },
-    { name: 'Remaining', value: 100 - goalAchievedPct, color: '#fed7aa' },
-  ];
+  // Income vs Expenses (Annual)
+  const annualIncome = firstYear.totalIncome;
+  const annualExpenses = firstYear.totalExpenses;
+  const annTaxesPct = (firstYear.totalTaxes / annualExpenses) * 100;
+  const annInsPct = (firstYear.totalInsurance / annualExpenses) * 100;
+  const annEssPct = (firstYear.totalEssentialSpending / annualExpenses) * 100;
+  const annDiscPct = (firstYear.totalDiscretionarySpending / annualExpenses) * 100;
+
+  // Income vs Expenses (Monthly)
+  const monthlyIncome = firstMonth.totalIncome;
+  const monthlyExpenses = firstMonth.totalExpenses;
+  const moTaxesPct = (firstMonth.taxes / monthlyExpenses) * 100;
+  const moInsPct = (firstMonth.insurance / monthlyExpenses) * 100;
+  const moEssPct = (firstMonth.essentialSpending / monthlyExpenses) * 100;
+  const moDiscPct = (firstMonth.discretionarySpending / monthlyExpenses) * 100;
+
+  // Tax Allocation
+  const totalAssets = firstMonth.balance403b + firstMonth.balanceRoth;
+  const taxFreePct = totalAssets > 0 ? (firstMonth.balanceRoth / totalAssets) * 100 : 0;
+  const taxDeferredPct = totalAssets > 0 ? (firstMonth.balance403b / totalAssets) * 100 : 0;
+
+  // Future View Data
+  const futureData = projection.yearly.map(y => ({
+    age: y.age,
+    year: new Date().getFullYear() + y.yearIndex,
+    assets: y.endBalance403b + y.endBalanceRoth
+  }));
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
       
-      {/* Top Banner Widget */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
-        <div className="bg-[#f97316] px-6 py-3">
-          <h2 className="text-white font-bold text-lg flex items-center space-x-2">
-            <ShieldCheck size={20} />
-            <span>Retirement Income & Strategy Overview</span>
-          </h2>
-        </div>
-        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-gray-100 text-center">
-          <div className="px-4">
-            <p className="text-sm font-medium text-gray-500 mb-1">Starting Account Balance</p>
-            <p className="text-3xl font-bold text-[#15325b]">{formatCurrency(firstMonth.balance403b + firstMonth.balanceRoth)}</p>
-            <p className="text-xs text-gray-400 mt-2">Combined 403b & Roth</p>
-          </div>
-          <div className="px-4 pt-4 md:pt-0">
-            <p className="text-sm font-medium text-gray-500 mb-1">Long-term Goal Achieved</p>
-            <p className="text-3xl font-bold text-[#15325b]">{goalAchievedPct.toFixed(0)}%</p>
-            <p className="text-xs text-gray-400 mt-2">Based on $1M Roth at age 85</p>
-          </div>
-          <div className="px-4 pt-4 md:pt-0">
-            <p className="text-sm font-medium text-gray-500 mb-1">Est. Starting Monthly Income</p>
-            <p className="text-3xl font-bold text-[#15325b]">{formatCurrency(firstMonth.totalIncome)}</p>
-            <p className="text-xs text-gray-400 mt-2">Pension + SS + Other</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      {/* 2-Column Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        {/* Goal Achievement Donut */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-          <div className="bg-[#15325b] px-4 py-2">
-            <h3 className="text-white font-medium flex items-center space-x-2">
-              <Target size={16} />
-              <span>Goal Achievement</span>
-            </h3>
-          </div>
-          <div className="p-6 flex-1 flex flex-col items-center justify-center relative">
-            <div className="h-48 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={goalData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    startAngle={90}
-                    endAngle={-270}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {goalData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(val: any) => `${val.toFixed(1)}%`} />
-                </PieChart>
-              </ResponsiveContainer>
+        {/* Panel 1: Benchmarks */}
+        <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200">
+          <h3 className="text-lg font-bold text-[#1a365d] mb-6">Retirement Benchmarks</h3>
+          
+          <div className="mb-6">
+            <div className="flex justify-between text-xs font-bold text-[#1a365d] mb-1">
+              <span>Secure Income Score</span>
+              <span className="text-[#3b82f6]">Benchmark: 80%</span>
             </div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-3xl font-bold text-gray-800">{goalAchievedPct.toFixed(0)}%</span>
+            <div className="flex items-center space-x-3">
+              <div className="flex-1 h-4 bg-gray-200 relative">
+                <div 
+                  className={`absolute top-0 left-0 h-full ${secureIncomeScore >= 80 ? 'bg-[#4c8b55]' : 'bg-[#eab308]'}`} 
+                  style={{ width: `${secureIncomeScore}%` }}
+                ></div>
+                <div className="absolute top-0 bottom-0 border-r-2 border-red-400" style={{ left: '80%' }}></div>
+              </div>
+              <span className={`font-bold ${secureIncomeScore >= 80 ? 'text-[#4c8b55]' : 'text-[#eab308]'}`}>
+                {secureIncomeScore.toFixed(0)}%
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between text-xs font-bold text-[#1a365d] mb-1">
+              <span>403b Depletion Year</span>
+              <span className="text-gray-400">Target: Never</span>
+            </div>
+            <div className="flex items-center space-x-3">
+               <span className={`font-bold text-lg ${projection.metrics.year403bDepleted ? 'text-red-600' : 'text-[#4c8b55]'}`}>
+                  {projection.metrics.year403bDepleted ? `Age ${projection.metrics.year403bDepleted}` : 'Fully Funded'}
+               </span>
             </div>
           </div>
         </div>
 
-        {/* Asset Allocation Donut */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-          <div className="bg-[#15325b] px-4 py-2">
-            <h3 className="text-white font-medium flex items-center space-x-2">
-              <TrendingUp size={16} />
-              <span>Initial Asset Allocation</span>
+        {/* Panel 2: Retirement Countdown */}
+        <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200 flex flex-col justify-center">
+           <h3 className="text-lg font-bold text-[#1a365d] mb-6">Retirement Target</h3>
+           <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+              <span className="text-sm font-bold text-[#1a365d]">Ron (Age {firstYear.age})</span>
+              <div className="flex space-x-2">
+                 <div className="bg-[#6b7280] text-white px-3 py-2 text-xl font-bold rounded-sm">0</div>
+                 <div className="bg-[#6b7280] text-white px-3 py-2 text-xl font-bold rounded-sm">0</div>
+                 <div className="bg-[#6b7280] text-white px-3 py-2 text-xl font-bold rounded-sm">0</div>
+              </div>
+           </div>
+           <div className="flex justify-between items-center pt-4">
+              <span className="text-sm font-bold text-[#1a365d]">Wife (Age {firstYear.age + 4})</span>
+              <span className="text-sm text-gray-500 italic">Working 1 more year</span>
+           </div>
+        </div>
+
+        {/* Panel 3: Annual Income vs Expenses */}
+        <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200">
+          <div className="flex justify-between items-end mb-4">
+            <h3 className="text-lg font-bold text-[#1a365d] leading-tight">
+              Annual Income <br/> vs. Expenses <br/>
+              <span className="text-2xl text-[#4c8b55]">{formatCurrency(annualIncome - annualExpenses)}</span>
             </h3>
           </div>
-          <div className="p-6 flex-1 flex flex-col items-center justify-center relative">
-            <div className="h-48 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={assetData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={2}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {assetData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(val: any) => formatCurrency(val)} />
-                </PieChart>
-              </ResponsiveContainer>
+
+          <div className="mb-4">
+            <div className="text-xs font-bold text-[#1a365d] mb-1">Annual Income: {formatCurrency(annualIncome)}</div>
+            <div className="h-6 bg-[#4c8b55] w-full"></div>
+          </div>
+
+          <div>
+            <div className="text-xs font-bold text-[#1a365d] mb-1">Annual Expenses: {formatCurrency(annualExpenses)}</div>
+            <div className="h-6 w-full flex">
+              <div className="bg-[#fca5a5] h-full" style={{ width: `${annInsPct}%` }} title="Insurance"></div>
+              <div className="bg-[#f87171] h-full" style={{ width: `${annTaxesPct}%` }} title="Taxes"></div>
+              <div className="bg-[#b91c1c] h-full" style={{ width: `${annEssPct}%` }} title="Essential"></div>
+              <div className="bg-[#7f1d1d] h-full" style={{ width: `${annDiscPct}%` }} title="Discretionary"></div>
+            </div>
+            <div className="flex text-[10px] space-x-3 mt-2 text-gray-500 font-medium">
+              <span className="flex items-center"><span className="w-2 h-2 bg-[#fca5a5] inline-block mr-1"></span> Insurance</span>
+              <span className="flex items-center"><span className="w-2 h-2 bg-[#f87171] inline-block mr-1"></span> Taxes</span>
+              <span className="flex items-center"><span className="w-2 h-2 bg-[#b91c1c] inline-block mr-1"></span> Essential</span>
+              <span className="flex items-center"><span className="w-2 h-2 bg-[#7f1d1d] inline-block mr-1"></span> Discretionary</span>
             </div>
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-           <div className="bg-[#15325b] px-4 py-2">
-            <h3 className="text-white font-medium">Key Metrics</h3>
+        {/* Panel 4: Monthly Income vs Expenses */}
+        <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200">
+          <div className="flex justify-between items-end mb-4">
+            <h3 className="text-lg font-bold text-[#1a365d] leading-tight">
+              Monthly Income <br/> vs. Expenses <br/>
+              <span className="text-2xl text-[#4c8b55]">{formatCurrency(monthlyIncome - monthlyExpenses)}</span>
+            </h3>
           </div>
-          <div className="p-6 flex-1 flex flex-col justify-center space-y-6">
-            <div>
-              <p className="text-sm text-gray-500 font-medium mb-1">Lifetime Pension Income</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(projection.metrics.lifetimePension)}</p>
+
+          <div className="mb-4">
+            <div className="text-xs font-bold text-[#1a365d] mb-1">Monthly Income: {formatCurrency(monthlyIncome)}</div>
+            <div className="h-6 bg-[#4c8b55] w-full"></div>
+          </div>
+
+          <div>
+            <div className="text-xs font-bold text-[#1a365d] mb-1">Monthly Expenses: {formatCurrency(monthlyExpenses)}</div>
+            <div className="h-6 w-full flex">
+              <div className="bg-[#fca5a5] h-full" style={{ width: `${moInsPct}%` }}></div>
+              <div className="bg-[#f87171] h-full" style={{ width: `${moTaxesPct}%` }}></div>
+              <div className="bg-[#b91c1c] h-full" style={{ width: `${moEssPct}%` }}></div>
+              <div className="bg-[#7f1d1d] h-full" style={{ width: `${moDiscPct}%` }}></div>
             </div>
-            <div>
-              <p className="text-sm text-gray-500 font-medium mb-1">Lifetime SS Income</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(projection.metrics.lifetimeSS)}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 font-medium mb-1">Total Roth Conversions</p>
-              <p className="text-2xl font-bold text-[#f97316]">
-                {formatCurrency(projection.yearly.reduce((sum, y) => sum + y.totalConversionToRoth, 0))}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 font-medium mb-1">Year 403b Depleted</p>
-              <p className={`text-xl font-bold ${projection.metrics.year403bDepleted ? 'text-red-600' : 'text-emerald-600'}`}>
-                {projection.metrics.year403bDepleted ? `Age ${projection.metrics.year403bDepleted}` : 'Never'}
-              </p>
+            <div className="flex text-[10px] space-x-3 mt-2 text-gray-500 font-medium">
+              <span className="flex items-center"><span className="w-2 h-2 bg-[#fca5a5] inline-block mr-1"></span> Insurance</span>
+              <span className="flex items-center"><span className="w-2 h-2 bg-[#f87171] inline-block mr-1"></span> Taxes</span>
+              <span className="flex items-center"><span className="w-2 h-2 bg-[#b91c1c] inline-block mr-1"></span> Essential</span>
+              <span className="flex items-center"><span className="w-2 h-2 bg-[#7f1d1d] inline-block mr-1"></span> Discretionary</span>
             </div>
           </div>
+        </div>
+
+        {/* Panel 5: Tax Allocation & Net Worth */}
+        <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200 flex flex-col justify-between">
+           <div>
+              <h3 className="text-lg font-bold text-[#1a365d] mb-4">Net Worth</h3>
+              <p className="text-3xl font-bold text-[#4c8b55] mb-4">{formatCurrency(totalAssets)}</p>
+           </div>
+           
+           <div>
+              <h3 className="text-lg font-bold text-[#1a365d] mb-2">Liquid Asset Tax Allocation</h3>
+              <div className="h-6 w-full flex mb-2">
+                 <div className="bg-[#4c8b55] h-full border-r border-white" style={{ width: `${taxFreePct}%` }}></div>
+                 <div className="bg-[#7c3aed] h-full border-r border-white" style={{ width: `${taxDeferredPct}%` }}></div>
+                 <div className="bg-[#3b82f6] h-full" style={{ width: '0%' }}></div>
+              </div>
+              <div className="flex text-[10px] space-x-4 text-gray-500 font-medium">
+                 <span className="flex items-center"><span className="w-2 h-2 bg-[#4c8b55] inline-block mr-1"></span> Tax Free (Roth): {taxFreePct.toFixed(0)}%</span>
+                 <span className="flex items-center"><span className="w-2 h-2 bg-[#7c3aed] inline-block mr-1"></span> Tax Deferred (403b): {taxDeferredPct.toFixed(0)}%</span>
+                 <span className="flex items-center"><span className="w-2 h-2 bg-[#3b82f6] inline-block mr-1"></span> Taxable: 0%</span>
+              </div>
+           </div>
+        </div>
+
+        {/* Panel 6: Future View */}
+        <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200">
+           <h3 className="text-lg font-bold text-[#1a365d] mb-4">Future View (Total Assets)</h3>
+           <div className="h-48 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={futureData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorAssets" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#4c8b55" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#4c8b55" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                  <XAxis 
+                     dataKey="year" 
+                     axisLine={false} 
+                     tickLine={false} 
+                     tick={{ fontSize: 10, fill: '#6b7280' }} 
+                     dy={10}
+                     interval="preserveStartEnd"
+                     minTickGap={30}
+                  />
+                  <YAxis 
+                     axisLine={false} 
+                     tickLine={false} 
+                     tick={{ fontSize: 10, fill: '#6b7280' }} 
+                     tickFormatter={formatCompact}
+                     dx={-10}
+                  />
+                  <Tooltip 
+                     formatter={(value: any) => [formatCurrency(value), 'Total Assets']}
+                     labelFormatter={(label) => `Year: ${label}`}
+                  />
+                  <Area type="monotone" dataKey="assets" stroke="#4c8b55" fillOpacity={1} fill="url(#colorAssets)" />
+                </AreaChart>
+              </ResponsiveContainer>
+           </div>
         </div>
 
       </div>

@@ -12,12 +12,15 @@ export interface MonthlyData {
   yourSS: number;
   totalIncome: number;
   
-  // Expenses
-  spending: number;
+  // Expenses & Taxes
+  essentialSpending: number;
+  discretionarySpending: number;
   insurance: number;
+  taxes: number;
   totalExpenses: number;
   
-  // Gap
+  // Net Income & Gap
+  netIncome: number;
   gap: number;
   
   // Withdrawals & Conversions
@@ -40,10 +43,13 @@ export interface YearlyData {
   totalYourSS: number;
   totalIncome: number;
   
-  totalSpending: number;
+  totalEssentialSpending: number;
+  totalDiscretionarySpending: number;
   totalInsurance: number;
+  totalTaxes: number;
   totalExpenses: number;
   
+  totalNetIncome: number;
   totalGap: number;
   
   totalWithdrawal403b: number;
@@ -74,7 +80,8 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
   let currentRoth = config.startingRoth;
   
   let currentPension = config.pensionStart;
-  let currentSpending = config.spendingStart;
+  let currentEssentialSpending = config.essentialSpending;
+  let currentDiscretionarySpending = config.discretionarySpending;
   
   const yearlyData: YearlyData[] = [];
   
@@ -93,7 +100,8 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
     // Annual COLA/Inflation applied at the start of each new year
     if (year > 0) {
       currentPension *= (1 + config.pensionCOLA);
-      currentSpending *= (1 + config.spendingInflation);
+      currentEssentialSpending *= (1 + config.spendingInflation);
+      currentDiscretionarySpending *= (1 + config.spendingInflation);
     }
     
     const yearObj: YearlyData = {
@@ -104,9 +112,12 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
       totalWifeSS: 0,
       totalYourSS: 0,
       totalIncome: 0,
-      totalSpending: 0,
+      totalEssentialSpending: 0,
+      totalDiscretionarySpending: 0,
       totalInsurance: 0,
+      totalTaxes: 0,
       totalExpenses: 0,
+      totalNetIncome: 0,
       totalGap: 0,
       totalWithdrawal403b: 0,
       totalWithdrawalRoth: 0,
@@ -134,10 +145,19 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
       
       const totalIncome = pension + wifeSalary + wifeSS + yourSS;
       
-      const spending = currentSpending;
+      const essentialSpending = currentEssentialSpending;
+      const discretionarySpending = currentDiscretionarySpending;
       // Insurance stops when you reach the end age
       const insurance = currentAge < config.insuranceEndAge ? config.insurancePremium : 0;
-      const totalExpenses = spending + insurance;
+      
+      // Calculate taxes (Assume pension, salary, and SS are taxable for this estimate)
+      // Note: In reality, SS taxation is complex (up to 85%), but we use effectiveTaxRate for a rough estimate
+      const taxableIncomeEstimate = pension + wifeSalary + wifeSS + yourSS;
+      const taxes = taxableIncomeEstimate * config.effectiveTaxRate;
+      
+      const netIncome = totalIncome - taxes - insurance;
+      
+      const totalExpenses = essentialSpending + discretionarySpending + insurance + taxes;
       
       const gap = totalExpenses > totalIncome ? totalExpenses - totalIncome : 0;
       
@@ -189,6 +209,13 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
         currentRoth += conversionToRoth;
       }
       
+      // Tax on 403b withdrawal and conversion
+      const additionalTaxes = (withdrawal403b + conversionToRoth) * config.effectiveTaxRate;
+      // We'll just add this to the total taxes and expenses for accurate tracking
+      const finalTaxes = taxes + additionalTaxes;
+      const finalTotalExpenses = totalExpenses + additionalTaxes;
+      const finalNetIncome = netIncome - additionalTaxes;
+      
       if (current403b === 0 && withdrawal403b > 0 && year403bDepleted === null) {
         year403bDepleted = currentAge;
       }
@@ -215,9 +242,12 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
         wifeSS,
         yourSS,
         totalIncome,
-        spending,
+        essentialSpending,
+        discretionarySpending,
         insurance,
-        totalExpenses,
+        taxes: finalTaxes,
+        totalExpenses: finalTotalExpenses,
+        netIncome: finalNetIncome,
         gap,
         withdrawal403b,
         withdrawalRoth,
@@ -233,9 +263,12 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
       yearObj.totalWifeSS += wifeSS;
       yearObj.totalYourSS += yourSS;
       yearObj.totalIncome += totalIncome;
-      yearObj.totalSpending += spending;
+      yearObj.totalEssentialSpending += essentialSpending;
+      yearObj.totalDiscretionarySpending += discretionarySpending;
       yearObj.totalInsurance += insurance;
-      yearObj.totalExpenses += totalExpenses;
+      yearObj.totalTaxes += finalTaxes;
+      yearObj.totalExpenses += finalTotalExpenses;
+      yearObj.totalNetIncome += finalNetIncome;
       yearObj.totalGap += gap;
       yearObj.totalWithdrawal403b += withdrawal403b;
       yearObj.totalWithdrawalRoth += withdrawalRoth;
