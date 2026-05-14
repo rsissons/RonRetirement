@@ -166,10 +166,14 @@ export function calculateProjection(config: Config): ProjectionResult {
       
       // All values below are MONTHLY — config stores monthly figures already.
       const pension = currentPension;
-      const wifeSalary = year < 2 ? config.wifeSalaryYears1_2 : 0;
+      // Compute wife's current age based on Ron's age + age difference
+      const wifeCurrentAge = currentAge + config.wifeAgeDifference;
       
-      // Wife SS starts (monthly amount from config)
-      const wifeSS = currentAge >= config.wifeSSStartAge ? config.wifeSS : 0;
+      // Wife's salary: active while she is younger than her retirement age
+      const wifeSalary = wifeCurrentAge < config.wifeRetirementAge ? config.wifeSalary : 0;
+      
+      // Wife SS: starts when she reaches her SS start age (typically same as retirement age)
+      const wifeSS = wifeCurrentAge >= config.wifeSSStartAge ? config.wifeSS : 0;
       
       // Your SS starts (monthly amount from config)
       const yourSS = currentAge >= config.yourSSStartAge ? config.yourSS : 0;

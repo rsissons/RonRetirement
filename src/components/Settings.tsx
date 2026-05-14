@@ -70,10 +70,11 @@ export const Settings: FC<Props> = ({ config, setConfig }) => {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-              <span>Wife's SS Start Age (Based on your age)</span>
-              <span className="font-bold text-[#0072B2]">{config.wifeSSStartAge}</span>
+              <span>Wife's Retirement Age (salary ends, SS starts)</span>
+              <span className="font-bold text-[#0072B2]">{config.wifeRetirementAge}</span>
             </label>
-            <input type="range" name="wifeSSStartAge" min="55" max="70" step="1" value={config.wifeSSStartAge} onChange={handleChange} className="w-full accent-[#0072B2]" />
+            <input type="range" name="wifeRetirementAge" min="60" max="70" step="1" value={config.wifeRetirementAge} onChange={handleChange} className="w-full accent-[#0072B2]" />
+            <p className="text-xs text-gray-400 mt-1">Wife is {config.wifeAgeDifference.toFixed(1)} yrs older · At your retirement she'll be ~{(config.retirementAge + config.wifeAgeDifference).toFixed(1)} yrs old</p>
           </div>
         </div>
 
@@ -117,10 +118,10 @@ export const Settings: FC<Props> = ({ config, setConfig }) => {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-              <span>Wife's Salary (Years 1-2)</span>
-              <span className="font-bold text-[#009E73]">${config.wifeSalaryYears1_2}</span>
+              <span>Wife's Salary (Monthly, while working)</span>
+              <span className="font-bold text-[#009E73]">${config.wifeSalary.toLocaleString()}</span>
             </label>
-            <input type="range" name="wifeSalaryYears1_2" min="0" max="10000" step="100" value={config.wifeSalaryYears1_2} onChange={handleChange} className="w-full accent-[#009E73]" />
+            <input type="range" name="wifeSalary" min="0" max="15000" step="100" value={config.wifeSalary} onChange={handleChange} className="w-full accent-[#009E73]" />
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">

@@ -9,10 +9,12 @@ export interface Config {
   pensionStart: number;
   pensionCOLA: number;
   
-  wifeSalaryYears1_2: number;
+  wifeSalary: number;          // Monthly salary while she's still working
+  wifeRetirementAge: number;   // Age at which wife stops working (and SS starts)
+  wifeAgeDifference: number;   // How many years older the wife is than Ron
   
   wifeSS: number;
-  wifeSSStartAge: number;
+  wifeSSStartAge: number;      // Wife's age when her SS starts (usually same as wifeRetirementAge)
   
   yourSS: number;
   yourSSStartAge: number;
@@ -48,10 +50,12 @@ export const defaultConfig: Config = {
   pensionStart: 11441,
   pensionCOLA: 0.02,
   
-  wifeSalaryYears1_2: 4500,
+  wifeSalary: 4500,            // Wife's monthly salary while working
+  wifeRetirementAge: 62,       // Wife stops working at 62
+  wifeAgeDifference: 3.79,     // Wife is ~3y 9mo older than Ron (born 5/12/1966 vs 2/25/1970)
   
   wifeSS: 1800,
-  wifeSSStartAge: 60,
+  wifeSSStartAge: 62,          // Wife's SS starts at her age 62
   
   yourSS: 2250,
   yourSSStartAge: 62,
