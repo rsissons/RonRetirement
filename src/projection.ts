@@ -72,6 +72,10 @@ export interface ProjectionResult {
     lifetimeSS: number;
     total403bWithdrawn: number;
     totalRothWithdrawn: number;
+    safeWithdrawalRate: number;
+    bucketIncome: number;
+    bucketConservative: number;
+    bucketModerate: number;
   };
 }
 
@@ -89,10 +93,18 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
   let peakRothBalance = currentRoth;
   let rothBalanceAt85 = 0;
   
-  let lifetimePension = 0;
-  let lifetimeSS = 0;
   let total403bWithdrawn = 0;
   let totalRothWithdrawn = 0;
+  
+  let lifetimePension = 0;
+  let lifetimeSS = 0;
+  
+  let bucketIncome = 0;
+  let bucketConservative = 0;
+  let bucketModerate = 0;
+  
+  let year1TotalWithdrawals = 0;
+  const year1StartingAssets = config.starting403b + config.startingRoth;
   
   for (let year = 0; year < config.projectionYears; year++) {
     const currentAge = config.retirementAge + year;
@@ -159,15 +171,15 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
       
       const totalExpenses = essentialSpending + discretionarySpending + insurance + taxes;
       
-      const gap = totalExpenses > totalIncome ? totalExpenses - totalIncome : 0;
+      const gap = totalExpenses - totalIncome;
       
       let withdrawal403b = 0;
       let withdrawalRoth = 0;
       let conversionToRoth = 0;
       
-      let remainingGap = gap;
+      let remainingGap = gap > 0 ? gap : 0;
       
-      if (current403b > 0) {
+      if (current403b > 0 && remainingGap > 0) {
         if (current403b >= remainingGap) {
           withdrawal403b = remainingGap;
           current403b -= remainingGap;
@@ -233,6 +245,16 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
       total403bWithdrawn += withdrawal403b;
       totalRothWithdrawn += withdrawalRoth;
       
+      if (year === 0) {
+         year1TotalWithdrawals += (withdrawal403b + withdrawalRoth);
+      }
+      
+      if (gap > 0) {
+         if (year >= 0 && year <= 2) bucketIncome += gap;
+         else if (year >= 3 && year <= 5) bucketConservative += gap;
+         else if (year >= 6 && year <= 8) bucketModerate += gap;
+      }
+      
       const monthObj: MonthlyData = {
         age: currentAge,
         yearIndex: year,
@@ -281,6 +303,8 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
     yearlyData.push(yearObj);
   }
   
+  const safeWithdrawalRate = year1StartingAssets > 0 ? (year1TotalWithdrawals / year1StartingAssets) * 100 : 0;
+
   return {
     yearly: yearlyData,
     metrics: {
@@ -290,7 +314,11 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
       lifetimePension,
       lifetimeSS,
       total403bWithdrawn,
-      totalRothWithdrawn
+      totalRothWithdrawn,
+      safeWithdrawalRate,
+      bucketIncome,
+      bucketConservative,
+      bucketModerate
     }
   };
 }
