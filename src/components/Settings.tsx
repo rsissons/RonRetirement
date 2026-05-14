@@ -159,6 +159,22 @@ export const Settings: FC<Props> = ({ config, setConfig }) => {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+              <span>Spending Inflation Rate</span>
+              <span className="font-bold text-[#D55E00]">{(config.spendingInflation * 100).toFixed(1)}%/yr</span>
+            </label>
+            <input type="range" name="spendingInflation" min="0" max="6" step="0.5" value={config.spendingInflation * 100} onChange={handleChange} className="w-full accent-[#D55E00]" />
+            <p className="text-xs text-gray-400 mt-1">How fast your spending grows each year. Pension COLA is {(config.pensionCOLA * 100).toFixed(0)}%/yr — if spending &gt; COLA, gaps grow over time.</p>
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+              <span>Pension COLA</span>
+              <span className="font-bold text-[#009E73]">{(config.pensionCOLA * 100).toFixed(1)}%/yr</span>
+            </label>
+            <input type="range" name="pensionCOLA" min="0" max="5" step="0.25" value={config.pensionCOLA * 100} onChange={handleChange} className="w-full accent-[#009E73]" />
+            <p className="text-xs text-gray-400 mt-1">CalPERS COLA. If this equals spending inflation, your purchasing power stays flat forever.</p>
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
               <span>Wife's Private Insurance (Monthly)</span>
               <span className="font-bold text-[#D55E00]">${config.insurancePremium}</span>
             </label>
