@@ -85,6 +85,8 @@ export function calculateProjection(config: Config): ProjectionResult {
   let current403b = config.starting403b;
   let currentRoth = config.startingRoth;
   
+  // All config spending/income values are MONTHLY figures.
+  // currentPension tracks the monthly pension amount, inflated by COLA each year.
   let currentPension = config.pensionStart;
   let currentEssentialSpending = config.essentialSpending;
   let currentDiscretionarySpending = config.discretionarySpending;
@@ -149,19 +151,21 @@ export function calculateProjection(config: Config): ProjectionResult {
       current403b *= (1 + (config.annualReturn / 12));
       currentRoth *= (1 + (config.annualReturn / 12));
       
-      const pension = currentPension / 12;
-      const wifeSalary = year < 2 ? config.wifeSalaryYears1_2 / 12 : 0; // Using wifeSalaryYears1_2 as the monthly salary for the first 2 years
+      // All values below are MONTHLY — config stores monthly figures already.
+      const pension = currentPension;
+      const wifeSalary = year < 2 ? config.wifeSalaryYears1_2 : 0;
       
-      // Wife SS starts
-      const wifeSS = currentAge >= config.wifeSSStartAge ? config.wifeSS / 12 : 0;
+      // Wife SS starts (monthly amount from config)
+      const wifeSS = currentAge >= config.wifeSSStartAge ? config.wifeSS : 0;
       
-      // Your SS starts
-      const yourSS = currentAge >= config.yourSSStartAge ? config.yourSS / 12 : 0;
+      // Your SS starts (monthly amount from config)
+      const yourSS = currentAge >= config.yourSSStartAge ? config.yourSS : 0;
       
       const totalIncome = pension + wifeSalary + wifeSS + yourSS;
       
-      const essentialSpending = currentEssentialSpending / 12;
-      const discretionarySpending = currentDiscretionarySpending / 12;
+      // Essential and discretionary are monthly from config
+      const essentialSpending = currentEssentialSpending;
+      const discretionarySpending = currentDiscretionarySpending;
       // Insurance stops when you reach the end age
       const insurance = currentAge <= config.insuranceEndAge ? config.insurancePremium : 0;
       // Medicare starts at age 65
