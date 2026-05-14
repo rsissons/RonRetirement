@@ -172,8 +172,8 @@ export function calculateProjection(config: Config): ProjectionResult {
       // Wife's salary: active while she is younger than her retirement age
       const wifeSalary = wifeCurrentAge < config.wifeRetirementAge ? config.wifeSalary : 0;
       
-      // Wife SS: starts when she reaches her SS start age (typically same as retirement age)
-      const wifeSS = wifeCurrentAge >= config.wifeSSStartAge ? config.wifeSS : 0;
+      // Wife SS: starts exactly when she retires (same age as salary ends — no overlap)
+      const wifeSS = wifeCurrentAge >= config.wifeRetirementAge ? config.wifeSS : 0;
       
       // Your SS starts (monthly amount from config)
       const yourSS = currentAge >= config.yourSSStartAge ? config.yourSS : 0;
@@ -348,7 +348,7 @@ export function calculateProjection(config: Config): ProjectionResult {
     
     // SS start events (compare first month of this year vs first month of last year)
     if (firstMonth.wifeSS > 0 && (prevYear === undefined || prevYear.months[0].wifeSS === 0)) {
-      notes.push(`✅ Wife's SS begins (+${formatNote(config.wifeSS)}/mo)`);
+      notes.push(`✅ Wife's SS begins (+${formatNote(config.wifeSS)}/mo at her age ${config.wifeRetirementAge})`);
     }
     if (firstMonth.yourSS > 0 && (prevYear === undefined || prevYear.months[0].yourSS === 0)) {
       notes.push(`✅ Your SS begins (+${formatNote(config.yourSS)}/mo)`);
