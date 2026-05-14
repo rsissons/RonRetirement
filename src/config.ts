@@ -27,10 +27,10 @@ export interface Config {
   
   rothExtraWithdrawal: number;
   
-  insurancePremium: number;
-  insuranceEndAge: number;
-  medicarePremium: number; // New: Medicare costs after 65
-  healthcareInflation: number; // New: Healthcare specific inflation
+  insurancePremium: number;       // Wife's monthly private insurance (until her age 65)
+  wifeInsuranceEndAge: number;    // Wife's age when private insurance ends (→ Medicare)
+  medicarePremium: number;        // Wife's Medicare cost after her age 65 (Ron = $0, CalPERS covers him)
+  healthcareInflation: number;
   
   retirementAge: number;
   yourRetirementDate: string;
@@ -68,9 +68,9 @@ export const defaultConfig: Config = {
   
   rothExtraWithdrawal: 0,
   
-  insurancePremium: 888,
-  insuranceEndAge: 61,
-  medicarePremium: 350, // Approx base Medicare B + Supplement for two
+  insurancePremium: 888,          // Wife's private insurance until she's 65
+  wifeInsuranceEndAge: 65,        // Wife goes on Medicare at 65; Ron covered by CalPERS forever
+  medicarePremium: 174,           // Wife's Medicare Part B only (~$174/mo 2024); Ron = $0
   healthcareInflation: 0.05,
   
   retirementAge: 59,

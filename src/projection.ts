@@ -183,10 +183,11 @@ export function calculateProjection(config: Config): ProjectionResult {
       // Essential and discretionary are monthly from config
       const essentialSpending = currentEssentialSpending;
       const discretionarySpending = currentDiscretionarySpending;
-      // Insurance stops when you reach the end age
-      const insurance = currentAge <= config.insuranceEndAge ? config.insurancePremium : 0;
-      // Medicare starts at age 65
-      const medicare = currentAge >= 65 ? currentMedicarePremium : 0;
+      // Ron has CalPERS lifetime medical at $0 — only wife's healthcare costs are modeled.
+      // Wife's private insurance: active until she reaches her Medicare age (default 65)
+      const insurance = wifeCurrentAge < config.wifeInsuranceEndAge ? config.insurancePremium : 0;
+      // Wife's Medicare: starts when she hits wifeInsuranceEndAge (Ron = always $0)
+      const medicare = wifeCurrentAge >= config.wifeInsuranceEndAge ? currentMedicarePremium : 0;
       
       // Income taxes on guaranteed income
       const taxableIncomeEstimate = pension + wifeSalary + wifeSS + yourSS;

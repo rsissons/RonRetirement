@@ -75,9 +75,9 @@ export const Overview: FC<Props> = ({ config, projection }) => {
   // Key milestones
   const milestones: { age: number; label: string }[] = [];
   milestones.push({ age: config.retirementAge, label: '🎉 Ron retires' });
-  if (config.wifeSSStartAge) milestones.push({ age: config.wifeSSStartAge, label: `✅ Wife's SS begins (+${$(config.wifeSS)}/mo)` });
+  if (config.wifeRetirementAge) milestones.push({ age: Math.round(config.retirementAge + config.wifeRetirementAge - config.wifeAgeDifference - config.retirementAge), label: `✅ Wife retires + SS begins (+$${config.wifeSS}/mo at her age ${config.wifeRetirementAge})` });
   if (config.yourSSStartAge) milestones.push({ age: config.yourSSStartAge, label: `✅ Ron's SS begins (+${$(config.yourSS)}/mo)` });
-  milestones.push({ age: config.insuranceEndAge, label: `💊 Insurance ends → Medicare begins` });
+  milestones.push({ age: Math.round(config.retirementAge + (config.wifeInsuranceEndAge - config.wifeAgeDifference - config.retirementAge)), label: `💊 Wife's insurance ends → Medicare ($${config.medicarePremium}/mo)` });
   milestones.push({ age: 75, label: '📋 RMDs required on 403b' });
   if (projection.metrics.year403bDepleted) milestones.push({ age: projection.metrics.year403bDepleted, label: '⚠️ 403b fully converted/depleted' });
   milestones.sort((a, b) => a.age - b.age);

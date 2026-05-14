@@ -159,24 +159,26 @@ export const Settings: FC<Props> = ({ config, setConfig }) => {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-              <span>Insurance Premium</span>
+              <span>Wife's Private Insurance (Monthly)</span>
               <span className="font-bold text-[#D55E00]">${config.insurancePremium}</span>
             </label>
             <input type="range" name="insurancePremium" min="0" max="2000" step="10" value={config.insurancePremium} onChange={handleChange} className="w-full accent-[#D55E00]" />
+            <p className="text-xs text-gray-400 mt-1">Ron's medical = $0 forever (CalPERS lifetime coverage)</p>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-              <span>Insurance Ends (At Your Age)</span>
-              <span className="font-bold text-[#D55E00]">{config.insuranceEndAge}</span>
+              <span>Wife's Insurance Ends (Her Age → Medicare)</span>
+              <span className="font-bold text-[#D55E00]">{config.wifeInsuranceEndAge}</span>
             </label>
-            <input type="range" name="insuranceEndAge" min="55" max="80" step="1" value={config.insuranceEndAge} onChange={handleChange} className="w-full accent-[#D55E00]" />
+            <input type="range" name="wifeInsuranceEndAge" min="60" max="70" step="1" value={config.wifeInsuranceEndAge} onChange={handleChange} className="w-full accent-[#D55E00]" />
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-              <span>Medicare Base Cost (Age 65+)</span>
+              <span>Wife's Medicare (Monthly, after her age {config.wifeInsuranceEndAge})</span>
               <span className="font-bold text-[#D55E00]">${config.medicarePremium}</span>
             </label>
-            <input type="range" name="medicarePremium" min="0" max="1000" step="10" value={config.medicarePremium} onChange={handleChange} className="w-full accent-[#D55E00]" />
+            <input type="range" name="medicarePremium" min="0" max="600" step="5" value={config.medicarePremium} onChange={handleChange} className="w-full accent-[#D55E00]" />
+            <p className="text-xs text-gray-400 mt-1">Wife's Medicare Part B only. Ron = $0 (CalPERS covers him).</p>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
