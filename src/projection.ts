@@ -61,6 +61,8 @@ export interface YearlyData {
   endBalance403b: number;
   endBalanceRoth: number;
   
+  notes: string[];
+  
   months: MonthlyData[];
 }
 
@@ -80,6 +82,10 @@ export interface ProjectionResult {
     bucketModerate: number;
   };
 }
+
+// Helper used in note generation
+const formatNote = (value: number) =>
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 
 export function calculateProjection(config: Config): ProjectionResult {
   let current403b = config.starting403b;
@@ -143,6 +149,7 @@ export function calculateProjection(config: Config): ProjectionResult {
       totalConversionToRoth: 0,
       endBalance403b: 0,
       endBalanceRoth: 0,
+      notes: [],
       months: []
     };
     
@@ -310,6 +317,47 @@ export function calculateProjection(config: Config): ProjectionResult {
     
     yearObj.endBalance403b = current403b;
     yearObj.endBalanceRoth = currentRoth;
+    
+    // --- Auto-generate notes for this year ---
+    const notes: string[] = [];
+    if (year === 0) notes.push('🎉 Retirement begins');
+    if (yearObj.totalWifeSalary > 0) notes.push('👩‍💼 Wife still working');
+    
+    const firstMonth = yearObj.months[0];
+    const prevYear = yearlyData[yearlyData.length - 1];
+    
+    // SS start events (compare first month of this year vs first month of last year)
+    if (firstMonth.wifeSS > 0 && (prevYear === undefined || prevYear.months[0].wifeSS === 0)) {
+      notes.push(`✅ Wife's SS begins (+${formatNote(config.wifeSS)}/mo)`);
+    }
+    if (firstMonth.yourSS > 0 && (prevYear === undefined || prevYear.months[0].yourSS === 0)) {
+      notes.push(`✅ Your SS begins (+${formatNote(config.yourSS)}/mo)`);
+    }
+    
+    // Insurance/Medicare transition
+    if (firstMonth.insurance === 0 && (prevYear === undefined || prevYear.months[0].insurance > 0)) {
+      notes.push(`💊 Insurance ends (save ${formatNote(config.insurancePremium)}/mo)`);
+    }
+    if (firstMonth.medicare > 0 && (prevYear === undefined || prevYear.months[0].medicare === 0)) {
+      notes.push(`🏥 Medicare begins (~${formatNote(firstMonth.medicare)}/mo)`);
+    }
+    
+    // 403b events
+    if (yearObj.totalConversionToRoth > 0) {
+      notes.push(`🔄 Roth conversion: ${formatNote(yearObj.totalConversionToRoth/12)}/mo`);
+    }
+    if (yearObj.totalWithdrawal403b > 0) {
+      notes.push(`📤 Gap covered by 403b: ${formatNote(yearObj.totalWithdrawal403b/12)}/mo avg`);
+    }
+    if (yearObj.totalWithdrawalRoth > 0) {
+      notes.push(`📤 Gap covered by Roth: ${formatNote(yearObj.totalWithdrawalRoth/12)}/mo avg`);
+    }
+    if (year403bDepleted === currentAge && yearObj.endBalance403b === 0) {
+      notes.push('⚠️ 403b fully depleted — Roth is primary');
+    }
+    if (currentAge === 75) notes.push('📋 RMDs required starting this year');
+    
+    yearObj.notes = notes;
     
     yearlyData.push(yearObj);
   }

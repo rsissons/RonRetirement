@@ -122,6 +122,7 @@ export const DataTable: FC<Props> = ({ config, projection }) => {
                 <th className={`px-3 py-3 ${COL_CONV}`}>Roth<br/>Conv.</th>
                 <th className={`px-3 py-3 ${COL_403B}`}>403b<br/>Balance</th>
                 <th className={`px-3 py-3 ${COL_ROTH}`}>Roth<br/>Balance</th>
+                <th className="px-3 py-3 text-gray-500 min-w-[220px]">Notes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -158,6 +159,13 @@ export const DataTable: FC<Props> = ({ config, projection }) => {
                     </td>
                     <td className={`px-3 py-2.5 ${COL_403B}`}>{formatCurrency(y.endBalance403b)}</td>
                     <td className={`px-3 py-2.5 ${COL_ROTH}`}>{formatCurrency(y.endBalanceRoth)}</td>
+                    <td className="px-3 py-2.5">
+                      <div className="flex flex-col gap-1">
+                        {y.notes.map((note, i) => (
+                          <span key={i} className="text-xs bg-gray-100 text-gray-700 rounded px-2 py-0.5 whitespace-nowrap">{note}</span>
+                        ))}
+                      </div>
+                    </td>
                   </tr>
                 );
               })}
@@ -194,6 +202,7 @@ export const DataTable: FC<Props> = ({ config, projection }) => {
                     </td>
                     <td className={`px-3 py-2 ${COL_403B}`}>{formatCurrency(m.balance403b)}</td>
                     <td className={`px-3 py-2 ${COL_ROTH}`}>{formatCurrency(m.balanceRoth)}</td>
+                    <td className="px-3 py-2 text-xs text-gray-400 italic">—</td>
                   </tr>
                 );
               })}
