@@ -89,7 +89,7 @@ function App() {
             {activeTab === 'income' && <IncomeBreakdown projection={projection} />}
             {activeTab === 'funding' && <FundingSource projection={projection} />}
             {activeTab === 'balances' && <AccountBalances projection={projection} />}
-            {activeTab === 'data' && <DataTable projection={projection} />}
+            {activeTab === 'data' && <DataTable config={config} projection={projection} />}
             {activeTab === 'settings' && <Settings config={config} setConfig={setConfig} />}
           </div>
         </main>

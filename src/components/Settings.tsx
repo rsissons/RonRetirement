@@ -140,10 +140,17 @@ export const Settings: FC<Props> = ({ config, setConfig }) => {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-              <span>Insurance Premium (Ends Age {config.insuranceEndAge})</span>
+              <span>Insurance Premium</span>
               <span className="font-bold text-[#D55E00]">${config.insurancePremium}</span>
             </label>
             <input type="range" name="insurancePremium" min="0" max="2000" step="10" value={config.insurancePremium} onChange={handleChange} className="w-full accent-[#D55E00]" />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+              <span>Insurance Ends (At Your Age)</span>
+              <span className="font-bold text-[#D55E00]">{config.insuranceEndAge}</span>
+            </label>
+            <input type="range" name="insuranceEndAge" min="55" max="80" step="1" value={config.insuranceEndAge} onChange={handleChange} className="w-full accent-[#D55E00]" />
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">

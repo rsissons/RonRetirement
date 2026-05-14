@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import type { FC } from 'react';
 import type { ProjectionResult } from '../projection';
+import type { Config } from '../config';
 
 interface Props {
+  config: Config;
   projection: ProjectionResult;
 }
 
 const formatCurrency = (value: number) => 
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 
-export const DataTable: FC<Props> = ({ projection }) => {
+export const DataTable: FC<Props> = ({ config, projection }) => {
   const [viewMode, setViewMode] = useState<'yearly' | 'monthly'>('yearly');
 
   const yearlyRows = projection.yearly;
@@ -47,11 +49,12 @@ export const DataTable: FC<Props> = ({ projection }) => {
                 <th className="px-4 py-3">Wife SS</th>
                 <th className="px-4 py-3">Your SS</th>
                 <th className="px-4 py-3">Insurance</th>
-                <th className="px-4 py-3 text-[#D55E00]">Taxes</th>
+                <th className="px-4 py-3 text-[#D55E00]">Taxes ({(config.effectiveTaxRate * 100).toFixed(1)}%)</th>
                 <th className="px-4 py-3 font-bold text-[#009E73]">Net Income</th>
                 <th className="px-4 py-3">Essential</th>
                 <th className="px-4 py-3">Discretionary</th>
                 <th className="px-4 py-3 text-[#D55E00]">Surplus/Shortfall</th>
+                <th className="px-4 py-3 text-[#0072B2]">Roth Conv</th>
                 <th className="px-4 py-3 text-[#56B4E9]">403b End</th>
                 <th className="px-4 py-3 text-[#0072B2]">Roth End</th>
               </tr>
@@ -64,7 +67,7 @@ export const DataTable: FC<Props> = ({ projection }) => {
                   <td className="px-4 py-3">{formatCurrency(y.totalWifeSalary)}</td>
                   <td className="px-4 py-3">{formatCurrency(y.totalWifeSS)}</td>
                   <td className="px-4 py-3">{formatCurrency(y.totalYourSS)}</td>
-                  <td className="px-4 py-3">{formatCurrency(y.totalInsurance)}</td>
+                  <td className="px-4 py-3">{formatCurrency(y.totalInsurance + y.totalMedicare)}</td>
                   <td className="px-4 py-3 text-[#D55E00]">{formatCurrency(y.totalTaxes)}</td>
                   <td className="px-4 py-3 font-bold bg-[#009E73]/10 text-[#009E73]">{formatCurrency(y.totalNetIncome)}</td>
                   <td className="px-4 py-3">{formatCurrency(y.totalEssentialSpending)}</td>
@@ -72,6 +75,7 @@ export const DataTable: FC<Props> = ({ projection }) => {
                   <td className={`px-4 py-3 font-medium ${y.totalGap > 0 ? 'text-[#D55E00]' : 'text-[#009E73]'}`}>
                     {y.totalGap > 0 ? formatCurrency(y.totalGap) : formatCurrency(-y.totalGap)}
                   </td>
+                  <td className="px-4 py-3 text-[#0072B2]">{formatCurrency(y.totalConversionToRoth)}</td>
                   <td className="px-4 py-3 font-medium text-[#56B4E9]">{formatCurrency(y.endBalance403b)}</td>
                   <td className="px-4 py-3 font-medium text-[#0072B2]">{formatCurrency(y.endBalanceRoth)}</td>
                 </tr>
@@ -84,7 +88,7 @@ export const DataTable: FC<Props> = ({ projection }) => {
                   <td className="px-4 py-3">{formatCurrency(m.wifeSalary)}</td>
                   <td className="px-4 py-3">{formatCurrency(m.wifeSS)}</td>
                   <td className="px-4 py-3">{formatCurrency(m.yourSS)}</td>
-                  <td className="px-4 py-3">{formatCurrency(m.insurance)}</td>
+                  <td className="px-4 py-3">{formatCurrency(m.insurance + m.medicare)}</td>
                   <td className="px-4 py-3 text-[#D55E00]">{formatCurrency(m.taxes)}</td>
                   <td className="px-4 py-3 font-bold bg-[#009E73]/10 text-[#009E73]">{formatCurrency(m.netIncome)}</td>
                   <td className="px-4 py-3">{formatCurrency(m.essentialSpending)}</td>
@@ -92,6 +96,7 @@ export const DataTable: FC<Props> = ({ projection }) => {
                   <td className={`px-4 py-3 font-medium ${m.gap > 0 ? 'text-[#D55E00]' : 'text-[#009E73]'}`}>
                     {m.gap > 0 ? formatCurrency(m.gap) : formatCurrency(-m.gap)}
                   </td>
+                  <td className="px-4 py-3 text-[#0072B2]">{formatCurrency(m.conversionToRoth)}</td>
                   <td className="px-4 py-3 font-medium text-[#56B4E9]">{formatCurrency(m.balance403b)}</td>
                   <td className="px-4 py-3 font-medium text-[#0072B2]">{formatCurrency(m.balanceRoth)}</td>
                 </tr>
