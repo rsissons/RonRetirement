@@ -17,7 +17,9 @@ export interface MonthlyData {
   discretionarySpending: number;
   insurance: number;
   medicare: number;
-  taxes: number;
+  incomeTaxes: number;      // Tax on pension, salary, SS
+  conversionTaxes: number;  // Tax on 403b→Roth conversions
+  taxes: number;            // Total taxes (income + conversion)
   totalExpenses: number;
   
   // Net Income & Gap
@@ -48,6 +50,8 @@ export interface YearlyData {
   totalDiscretionarySpending: number;
   totalInsurance: number;
   totalMedicare: number;
+  totalIncomeTaxes: number;
+  totalConversionTaxes: number;
   totalTaxes: number;
   totalExpenses: number;
   
@@ -140,6 +144,8 @@ export function calculateProjection(config: Config): ProjectionResult {
       totalDiscretionarySpending: 0,
       totalInsurance: 0,
       totalMedicare: 0,
+      totalIncomeTaxes: 0,
+      totalConversionTaxes: 0,
       totalTaxes: 0,
       totalExpenses: 0,
       totalNetIncome: 0,
@@ -283,6 +289,8 @@ export function calculateProjection(config: Config): ProjectionResult {
         discretionarySpending,
         insurance,
         medicare,
+        incomeTaxes,
+        conversionTaxes,
         taxes: totalTaxes,
         totalExpenses,
         netIncome,
@@ -305,6 +313,8 @@ export function calculateProjection(config: Config): ProjectionResult {
       yearObj.totalDiscretionarySpending += discretionarySpending;
       yearObj.totalInsurance += insurance;
       yearObj.totalMedicare += medicare;
+      yearObj.totalIncomeTaxes += incomeTaxes;
+      yearObj.totalConversionTaxes += conversionTaxes;
       yearObj.totalTaxes += totalTaxes;
       yearObj.totalExpenses += totalExpenses;
       yearObj.totalNetIncome += netIncome;

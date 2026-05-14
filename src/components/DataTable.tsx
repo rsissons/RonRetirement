@@ -111,11 +111,12 @@ export const DataTable: FC<Props> = ({ config, projection }) => {
                 <th className="px-3 py-3">Wife SS</th>
                 <th className="px-3 py-3">Your SS</th>
                 <th className="px-3 py-3">Healthcare</th>
-                <th className={`px-3 py-3 ${COL_TAXES}`}>Taxes ({(config.effectiveTaxRate * 100).toFixed(1)}%)</th>
+                <th className={`px-3 py-3 ${COL_TAXES}`} title="Tax on pension, salary & Social Security income">Income<br/>Tax</th>
+                <th className={`px-3 py-3 ${COL_TAXES}`} title="Tax owed when converting 403b funds to Roth IRA">Conv.<br/>Tax</th>
+                <th className={`px-3 py-3 font-bold text-gray-700`} title="All outflows: Essential + Discretionary + Healthcare + Income Tax + Conversion Tax">Total Spend ⓘ</th>
                 <th className={`px-3 py-3 font-bold text-[#009E73]`}>Net Income</th>
                 <th className="px-3 py-3">Essential</th>
                 <th className="px-3 py-3">Discret.</th>
-                <th className="px-3 py-3 font-bold">Total Spend</th>
                 <th className={`px-3 py-3 text-[#009E73]`}>+Surplus<br/><span className="text-[#D55E00]">-Shortfall</span></th>
                 <th className={`px-3 py-3 ${COL_WITHD}`}>403b<br/>Withdrawal</th>
                 <th className={`px-3 py-3 ${COL_WITHD}`}>Roth<br/>Withdrawal</th>
@@ -139,11 +140,12 @@ export const DataTable: FC<Props> = ({ config, projection }) => {
                     <td className="px-3 py-2.5">{formatCurrency(y.totalWifeSS)}</td>
                     <td className="px-3 py-2.5">{formatCurrency(y.totalYourSS)}</td>
                     <td className="px-3 py-2.5">{formatCurrency(y.totalInsurance + y.totalMedicare)}</td>
-                    <td className={`px-3 py-2.5 ${COL_TAXES}`}>{formatCurrency(y.totalTaxes)}</td>
+                    <td className={`px-3 py-2.5 ${COL_TAXES}`}>{formatCurrency(y.totalIncomeTaxes)}</td>
+                    <td className={`px-3 py-2.5 ${COL_TAXES}`}>{y.totalConversionTaxes > 0 ? formatCurrency(y.totalConversionTaxes) : '—'}</td>
+                    <td className="px-3 py-2.5 font-bold" title={`Essential ${formatCurrency(y.totalEssentialSpending)} + Discretionary ${formatCurrency(y.totalDiscretionarySpending)} + Healthcare ${formatCurrency(y.totalInsurance + y.totalMedicare)} + Taxes ${formatCurrency(y.totalTaxes)}`}>{formatCurrency(y.totalExpenses)}</td>
                     <td className={`px-3 py-2.5 ${COL_NET}`}>{formatCurrency(y.totalNetIncome)}</td>
                     <td className="px-3 py-2.5">{formatCurrency(y.totalEssentialSpending)}</td>
                     <td className="px-3 py-2.5">{formatCurrency(y.totalDiscretionarySpending)}</td>
-                    <td className="px-3 py-2.5 font-bold">{formatCurrency(y.totalExpenses)}</td>
                     <td className={`px-3 py-2.5 ${isShortfall ? COL_SHORTFALL : COL_SURPLUS}`}>
                       {formatGap(y.totalGap)}
                     </td>
@@ -183,11 +185,12 @@ export const DataTable: FC<Props> = ({ config, projection }) => {
                     <td className="px-3 py-2">{formatCurrency(m.wifeSS)}</td>
                     <td className="px-3 py-2">{formatCurrency(m.yourSS)}</td>
                     <td className="px-3 py-2">{formatCurrency(m.insurance + m.medicare)}</td>
-                    <td className={`px-3 py-2 ${COL_TAXES}`}>{formatCurrency(m.taxes)}</td>
+                    <td className={`px-3 py-2 ${COL_TAXES}`}>{formatCurrency(m.incomeTaxes)}</td>
+                    <td className={`px-3 py-2 ${COL_TAXES}`}>{m.conversionTaxes > 0 ? formatCurrency(m.conversionTaxes) : '—'}</td>
+                    <td className="px-3 py-2 font-bold" title={`Essential ${formatCurrency(m.essentialSpending)} + Discretionary ${formatCurrency(m.discretionarySpending)} + Healthcare ${formatCurrency(m.insurance + m.medicare)} + Taxes ${formatCurrency(m.taxes)}`}>{formatCurrency(m.totalExpenses)}</td>
                     <td className={`px-3 py-2 ${COL_NET}`}>{formatCurrency(m.netIncome)}</td>
                     <td className="px-3 py-2">{formatCurrency(m.essentialSpending)}</td>
                     <td className="px-3 py-2">{formatCurrency(m.discretionarySpending)}</td>
-                    <td className="px-3 py-2 font-bold">{formatCurrency(m.totalExpenses)}</td>
                     <td className={`px-3 py-2 ${isShortfall ? COL_SHORTFALL : COL_SURPLUS}`}>
                       {formatGap(m.gap)}
                     </td>
