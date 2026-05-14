@@ -160,6 +160,7 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
         }
       }
       
+      // If 403b depleted, withdraw from Roth
       if (remainingGap > 0) {
         if (currentRoth >= remainingGap) {
           withdrawalRoth = remainingGap;
@@ -170,6 +171,16 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
           remainingGap -= currentRoth;
           currentRoth = 0;
         }
+      }
+      
+      // Discretionary Roth Extra Withdrawal
+      const rothExtraMonthly = config.rothExtraWithdrawal / 12;
+      if (currentRoth >= rothExtraMonthly) {
+        currentRoth -= rothExtraMonthly;
+        withdrawalRoth += rothExtraMonthly;
+      } else if (currentRoth > 0) {
+        withdrawalRoth += currentRoth;
+        currentRoth = 0;
       }
       
       if (current403b > 0) {

@@ -30,12 +30,26 @@ function App() {
   return (
     <div className="flex h-screen bg-gray-50 font-sans text-gray-900">
       {/* Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-6 border-b border-gray-200">
-          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-            Retirement Planner
+      <div className="w-64 bg-[#15325b] text-white flex flex-col shadow-xl z-20">
+        <div className="p-6 border-b border-[#1e447a] text-center">
+          <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 border-4 border-[#3b82f6] flex items-center justify-center overflow-hidden">
+             {/* Profile placeholder */}
+             <div className="text-[#15325b] font-bold text-2xl">RS</div>
+          </div>
+          <h1 className="text-xl font-bold text-white tracking-wide">
+            Ron
           </h1>
+          <p className="text-[#93c5fd] text-xs uppercase tracking-wider mt-1">Retirement Planner</p>
         </div>
+        
+        <div className="px-6 py-4 border-b border-[#1e447a]">
+          <p className="text-xs text-[#93c5fd] uppercase tracking-wider mb-1">Today</p>
+          <p className="text-2xl font-bold text-white">
+            ${((config.starting403b + config.startingRoth) / 1000).toFixed(0)}k
+          </p>
+          <p className="text-xs text-white/70">Starting Account Balance</p>
+        </div>
+
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -46,19 +60,16 @@ function App() {
                 onClick={() => setActiveTab(item.id)}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                   isActive 
-                    ? 'bg-blue-50 text-blue-700 font-semibold shadow-sm' 
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-white text-[#15325b] font-semibold shadow-sm' 
+                    : 'text-white/70 hover:bg-[#1e447a] hover:text-white'
                 }`}
               >
-                <Icon size={20} className={isActive ? 'text-blue-600' : 'text-gray-400'} />
+                <Icon size={20} className={isActive ? 'text-[#3b82f6]' : 'text-white/50'} />
                 <span>{item.label}</span>
               </button>
             );
           })}
         </nav>
-        <div className="p-4 border-t border-gray-200 text-xs text-gray-400 text-center">
-          Private Client Dashboard
-        </div>
       </div>
 
       {/* Main Content */}

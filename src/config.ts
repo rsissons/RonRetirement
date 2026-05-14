@@ -21,6 +21,8 @@ export interface AppConfig {
   spendingStart: number;
   spendingInflation: number;
   
+  rothExtraWithdrawal: number; // Discretionary annual Roth withdrawal
+  
   insurancePremium: number;
   insuranceEndAge: number; // YOUR age when insurance stops (e.g. 60 meaning it covers age 60 and stops at 61, or 61 meaning it covers up to and including 61. If she is 4 years older, she hits 65 when you hit 61. So insurance stops when you hit 61. We'll say it covers you while age < 61).
   
@@ -52,8 +54,10 @@ export const defaultConfig: AppConfig = {
   yourSS: 2250,
   yourSSStartAge: 62,
   
-  spendingStart: 16000,
+  spendingStart: 13000,
   spendingInflation: 0.03,
+  
+  rothExtraWithdrawal: 0,
   
   // Insurance stops when she is 65. If she's 4 years older, you are 61.
   insurancePremium: 888,

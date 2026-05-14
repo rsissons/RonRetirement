@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import type { ProjectionResult } from '../projection';
-import { Wallet, TrendingDown, TrendingUp, PiggyBank, Landmark } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { ShieldCheck, Target, TrendingUp } from 'lucide-react';
 
 interface Props {
   projection: ProjectionResult;
@@ -13,83 +14,158 @@ export const Overview: FC<Props> = ({ projection }) => {
   const firstYear = projection.yearly[0];
   const firstMonth = firstYear.months[0];
   
+  // Data for Asset Allocation
+  const assetData = [
+    { name: '403b', value: firstMonth.balance403b, color: '#15325b' },
+    { name: 'Roth', value: firstMonth.balanceRoth, color: '#f97316' },
+  ].filter(d => d.value > 0);
+  
+  // If no assets yet, just show a blank or default
+  if (assetData.length === 0) {
+    assetData.push({ name: 'Empty', value: 1, color: '#e5e7eb' });
+  }
+
+  // Calculate goal achieved roughly based on Roth balance at 85 vs a 1M goal
+  const goalTarget = 1000000;
+  const goalAchievedPct = Math.min(100, Math.max(0, (projection.metrics.rothBalanceAt85 / goalTarget) * 100));
+  
+  const goalData = [
+    { name: 'Achieved', value: goalAchievedPct, color: '#f97316' },
+    { name: 'Remaining', value: 100 - goalAchievedPct, color: '#fed7aa' },
+  ];
+
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Retirement Overview (Initial Month)</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-          <div className="p-3 bg-green-100 text-green-600 rounded-lg">
-            <TrendingUp size={24} />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 font-medium">Monthly Net Income</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(firstMonth.totalIncome)}</p>
-          </div>
+      {/* Top Banner Widget */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+        <div className="bg-[#f97316] px-6 py-3">
+          <h2 className="text-white font-bold text-lg flex items-center space-x-2">
+            <ShieldCheck size={20} />
+            <span>Retirement Income & Strategy Overview</span>
+          </h2>
         </div>
-        
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-          <div className="p-3 bg-red-100 text-red-600 rounded-lg">
-            <TrendingDown size={24} />
+        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-gray-100 text-center">
+          <div className="px-4">
+            <p className="text-sm font-medium text-gray-500 mb-1">Starting Account Balance</p>
+            <p className="text-3xl font-bold text-[#15325b]">{formatCurrency(firstMonth.balance403b + firstMonth.balanceRoth)}</p>
+            <p className="text-xs text-gray-400 mt-2">Combined 403b & Roth</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 font-medium">Monthly Spending (Incl. Ins.)</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(firstMonth.totalExpenses)}</p>
+          <div className="px-4 pt-4 md:pt-0">
+            <p className="text-sm font-medium text-gray-500 mb-1">Long-term Goal Achieved</p>
+            <p className="text-3xl font-bold text-[#15325b]">{goalAchievedPct.toFixed(0)}%</p>
+            <p className="text-xs text-gray-400 mt-2">Based on $1M Roth at age 85</p>
           </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-          <div className="p-3 bg-orange-100 text-orange-600 rounded-lg">
-            <Wallet size={24} />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 font-medium">Monthly Gap</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(firstMonth.gap)}</p>
-          </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-          <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
-            <PiggyBank size={24} />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 font-medium">403b Balance</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(firstMonth.balance403b)}</p>
-          </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-          <div className="p-3 bg-purple-100 text-purple-600 rounded-lg">
-            <Landmark size={24} />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 font-medium">Roth Balance</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(firstMonth.balanceRoth)}</p>
+          <div className="px-4 pt-4 md:pt-0">
+            <p className="text-sm font-medium text-gray-500 mb-1">Est. Starting Monthly Income</p>
+            <p className="text-3xl font-bold text-[#15325b]">{formatCurrency(firstMonth.totalIncome)}</p>
+            <p className="text-xs text-gray-400 mt-2">Pension + SS + Other</p>
           </div>
         </div>
       </div>
-      
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Lifetime Metrics</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard title="Total 403b Withdrawn" value={formatCurrency(projection.metrics.total403bWithdrawn)} />
-        <MetricCard title="Total Roth Withdrawn" value={formatCurrency(projection.metrics.totalRothWithdrawn)} />
-        <MetricCard title="Peak Roth Balance" value={formatCurrency(projection.metrics.peakRothBalance)} />
-        <MetricCard title="Roth Balance at 85" value={formatCurrency(projection.metrics.rothBalanceAt85)} />
-        <MetricCard title="Lifetime Pension Income" value={formatCurrency(projection.metrics.lifetimePension)} />
-        <MetricCard title="Lifetime SS Income" value={formatCurrency(projection.metrics.lifetimeSS)} />
-        <MetricCard 
-          title="Year 403b Depleted" 
-          value={projection.metrics.year403bDepleted ? `Age ${projection.metrics.year403bDepleted}` : 'Never'} 
-          highlight={!!projection.metrics.year403bDepleted}
-        />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        
+        {/* Goal Achievement Donut */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+          <div className="bg-[#15325b] px-4 py-2">
+            <h3 className="text-white font-medium flex items-center space-x-2">
+              <Target size={16} />
+              <span>Goal Achievement</span>
+            </h3>
+          </div>
+          <div className="p-6 flex-1 flex flex-col items-center justify-center relative">
+            <div className="h-48 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={goalData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    startAngle={90}
+                    endAngle={-270}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {goalData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(val: any) => `${val.toFixed(1)}%`} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-3xl font-bold text-gray-800">{goalAchievedPct.toFixed(0)}%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Asset Allocation Donut */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+          <div className="bg-[#15325b] px-4 py-2">
+            <h3 className="text-white font-medium flex items-center space-x-2">
+              <TrendingUp size={16} />
+              <span>Initial Asset Allocation</span>
+            </h3>
+          </div>
+          <div className="p-6 flex-1 flex flex-col items-center justify-center relative">
+            <div className="h-48 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={assetData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={2}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {assetData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(val: any) => formatCurrency(val)} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+           <div className="bg-[#15325b] px-4 py-2">
+            <h3 className="text-white font-medium">Key Metrics</h3>
+          </div>
+          <div className="p-6 flex-1 flex flex-col justify-center space-y-6">
+            <div>
+              <p className="text-sm text-gray-500 font-medium mb-1">Lifetime Pension Income</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(projection.metrics.lifetimePension)}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 font-medium mb-1">Lifetime SS Income</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(projection.metrics.lifetimeSS)}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 font-medium mb-1">Total Roth Conversions</p>
+              <p className="text-2xl font-bold text-[#f97316]">
+                {formatCurrency(projection.yearly.reduce((sum, y) => sum + y.totalConversionToRoth, 0))}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 font-medium mb-1">Year 403b Depleted</p>
+              <p className={`text-xl font-bold ${projection.metrics.year403bDepleted ? 'text-red-600' : 'text-emerald-600'}`}>
+                {projection.metrics.year403bDepleted ? `Age ${projection.metrics.year403bDepleted}` : 'Never'}
+              </p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
 };
-
-const MetricCard = ({ title, value, highlight = false }: { title: string, value: string, highlight?: boolean }) => (
-  <div className={`p-5 rounded-xl shadow-sm border ${highlight ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-100'}`}>
-    <p className="text-sm text-gray-500 font-medium mb-1">{title}</p>
-    <p className={`text-xl font-bold ${highlight ? 'text-orange-700' : 'text-gray-900'}`}>{value}</p>
-  </div>
-);

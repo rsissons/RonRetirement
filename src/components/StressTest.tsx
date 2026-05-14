@@ -115,6 +115,26 @@ export const StressTest: FC<Props> = ({ config, setConfig }) => {
           />
         </div>
         
+        <div className="mb-8">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex justify-between">
+            <span>Discretionary Roth Withdrawal (Annual)</span>
+            <span className="font-bold text-teal-600">${config.rothExtraWithdrawal}</span>
+          </label>
+          <input 
+            type="range" 
+            name="rothExtraWithdrawal"
+            min="0" 
+            max="50000" 
+            step="1000" 
+            value={config.rothExtraWithdrawal} 
+            onChange={handleChange}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
+          />
+          <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <span>Travel, big purchases, etc.</span>
+          </div>
+        </div>
+        
       </div>
     </div>
   );
