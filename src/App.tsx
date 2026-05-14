@@ -85,7 +85,7 @@ function App() {
         
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-6xl mx-auto">
-            {activeTab === 'overview' && <Overview projection={projection} />}
+            {activeTab === 'overview' && <Overview config={config} projection={projection} />}
             {activeTab === 'income' && <IncomeBreakdown projection={projection} />}
             {activeTab === 'funding' && <FundingSource projection={projection} />}
             {activeTab === 'balances' && <AccountBalances projection={projection} />}

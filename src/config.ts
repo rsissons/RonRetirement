@@ -31,6 +31,8 @@ export interface Config {
   healthcareInflation: number; // New: Healthcare specific inflation
   
   retirementAge: number;
+  yourRetirementDate: string;
+  wifeRetirementDate: string;
   
   maxMonthlyConversion: number;
 }
@@ -68,6 +70,8 @@ export const defaultConfig: Config = {
   healthcareInflation: 0.05,
   
   retirementAge: 59,
+  yourRetirementDate: '2029-10-31',
+  wifeRetirementDate: '2030-01-31',
   
   maxMonthlyConversion: 2500,
 };

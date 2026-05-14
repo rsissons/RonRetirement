@@ -1,8 +1,10 @@
 import type { FC } from 'react';
 import type { ProjectionResult } from '../projection';
+import type { Config } from '../config';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface Props {
+  config: Config;
   projection: ProjectionResult;
 }
 
@@ -21,9 +23,40 @@ const C_INFO_DARK = "#0072B2"; // Blue
 const C_ORANGE = "#E69F00"; // Orange
 const C_PURPLE = "#CC79A7"; // Reddish Purple
 
-export const Overview: FC<Props> = ({ projection }) => {
+export const Overview: FC<Props> = ({ config, projection }) => {
   const firstYear = projection.yearly[0];
   const firstMonth = firstYear.months[0];
+  
+  // Calculate Countdowns
+  const calculateCountdown = (targetDateStr: string) => {
+    const target = new Date(targetDateStr);
+    const now = new Date();
+    
+    if (isNaN(target.getTime()) || target < now) {
+      return { years: 0, months: 0, days: 0 };
+    }
+    
+    let years = target.getFullYear() - now.getFullYear();
+    let months = target.getMonth() - now.getMonth();
+    let days = target.getDate() - now.getDate();
+    
+    if (days < 0) {
+      months -= 1;
+      // Get days in previous month
+      const prevMonth = new Date(target.getFullYear(), target.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+    
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+    
+    return { years, months, days };
+  };
+
+  const yourCountdown = calculateCountdown(config.yourRetirementDate);
+  const wifeCountdown = calculateCountdown(config.wifeRetirementDate);
   
   // Secure Income Score: (Guaranteed Income / Essential Expenses)
   const secureIncome = firstYear.totalPension + firstYear.totalWifeSalary + firstYear.totalWifeSS + firstYear.totalYourSS;
@@ -129,23 +162,23 @@ export const Overview: FC<Props> = ({ projection }) => {
           </div>
         </div>
 
-        {/* Panel 2: Retirement Countdown */}
+        {/* Panel 2: Retirement Target */}
         <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200">
            <h3 className="text-lg font-bold text-[#1a365d] mb-6">Retirement Target</h3>
            <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-              <span className="text-sm font-bold text-[#1a365d] w-1/2 text-right pr-4">Ron (Age {firstYear.age})</span>
+              <span className="text-sm font-bold text-[#1a365d] w-1/2 text-right pr-4">Ron ({config.yourRetirementDate})</span>
               <div className="flex space-x-2 w-1/2">
-                 <div className="flex flex-col items-center"><div className="bg-[#15325b] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">0</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">YEARS</span></div>
-                 <div className="flex flex-col items-center"><div className="bg-[#15325b] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">0</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">MONTHS</span></div>
-                 <div className="flex flex-col items-center"><div className="bg-[#15325b] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">0</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">DAYS</span></div>
+                 <div className="flex flex-col items-center"><div className="bg-[#15325b] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">{yourCountdown.years}</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">YEARS</span></div>
+                 <div className="flex flex-col items-center"><div className="bg-[#15325b] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">{yourCountdown.months}</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">MONTHS</span></div>
+                 <div className="flex flex-col items-center"><div className="bg-[#15325b] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">{yourCountdown.days}</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">DAYS</span></div>
               </div>
            </div>
            <div className="flex justify-between items-center pt-4">
-              <span className="text-sm font-bold text-[#1a365d] w-1/2 text-right pr-4">Wife (Age {firstYear.age + 4})</span>
+              <span className="text-sm font-bold text-[#1a365d] w-1/2 text-right pr-4">Wife ({config.wifeRetirementDate})</span>
               <div className="flex space-x-2 w-1/2">
-                 <div className="flex flex-col items-center"><div className="bg-[#9ca3af] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">1</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">YEARS</span></div>
-                 <div className="flex flex-col items-center"><div className="bg-[#9ca3af] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">0</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">MONTHS</span></div>
-                 <div className="flex flex-col items-center"><div className="bg-[#9ca3af] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">0</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">DAYS</span></div>
+                 <div className="flex flex-col items-center"><div className="bg-[#9ca3af] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">{wifeCountdown.years}</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">YEARS</span></div>
+                 <div className="flex flex-col items-center"><div className="bg-[#9ca3af] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">{wifeCountdown.months}</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">MONTHS</span></div>
+                 <div className="flex flex-col items-center"><div className="bg-[#9ca3af] text-white px-3 py-2 text-xl font-bold rounded-sm w-12 text-center">{wifeCountdown.days}</div><span className="text-[10px] font-bold text-[#1a365d] mt-1">DAYS</span></div>
               </div>
            </div>
         </div>

@@ -10,6 +10,12 @@ export const Settings: FC<Props> = ({ config, setConfig }) => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    if (name === 'yourRetirementDate' || name === 'wifeRetirementDate') {
+      setConfig(prev => ({ ...prev, [name]: value }));
+      return;
+    }
+
     let numValue = parseFloat(value);
     
     // Convert percentages to decimals for the config state
@@ -42,6 +48,18 @@ export const Settings: FC<Props> = ({ config, setConfig }) => {
               <span className="font-bold text-[#0072B2]">{config.retirementAge}</span>
             </label>
             <input type="range" name="retirementAge" min="55" max="70" step="1" value={config.retirementAge} onChange={handleChange} className="w-full accent-[#0072B2]" />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+              <span>Your Target Date</span>
+            </label>
+            <input type="date" name="yourRetirementDate" value={config.yourRetirementDate} onChange={handleChange} className="w-full border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 border" />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+              <span>Wife's Target Date</span>
+            </label>
+            <input type="date" name="wifeRetirementDate" value={config.wifeRetirementDate} onChange={handleChange} className="w-full border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 border" />
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
