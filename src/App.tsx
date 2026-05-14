@@ -1,19 +1,19 @@
 import { useState, useMemo } from 'react';
 import { defaultConfig } from './config';
-import type { AppConfig } from './config';
+import type { Config } from './config';
 import { calculateProjection } from './projection';
 import { Overview } from './components/Overview';
 import { IncomeBreakdown } from './components/IncomeBreakdown';
 import { FundingSource } from './components/FundingSource';
 import { AccountBalances } from './components/AccountBalances';
 import { DataTable } from './components/DataTable';
-import { StressTest } from './components/StressTest';
-import { LayoutDashboard, PieChart, Layers, LineChart as LineChartIcon, SlidersHorizontal, TableProperties } from 'lucide-react';
+import { Settings } from './components/Settings';
+import { LayoutDashboard, PieChart, Layers, LineChart as LineChartIcon, Settings as SettingsIcon, TableProperties } from 'lucide-react';
 
-type Tab = 'overview' | 'income' | 'funding' | 'balances' | 'data' | 'stress';
+type Tab = 'overview' | 'income' | 'funding' | 'balances' | 'data' | 'settings';
 
 function App() {
-  const [config, setConfig] = useState<AppConfig>(defaultConfig);
+  const [config, setConfig] = useState<Config>(defaultConfig);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
 
   const projection = useMemo(() => calculateProjection(config), [config]);
@@ -24,7 +24,7 @@ function App() {
     { id: 'funding', label: 'Funding Source', icon: Layers },
     { id: 'balances', label: 'Account Balances', icon: LineChartIcon },
     { id: 'data', label: 'Data Table', icon: TableProperties },
-    { id: 'stress', label: 'Stress Test', icon: SlidersHorizontal },
+    { id: 'settings', label: 'Settings & Assumptions', icon: SettingsIcon },
   ] as const;
 
   return (
@@ -89,8 +89,8 @@ function App() {
             {activeTab === 'income' && <IncomeBreakdown projection={projection} />}
             {activeTab === 'funding' && <FundingSource projection={projection} />}
             {activeTab === 'balances' && <AccountBalances projection={projection} />}
-            { activeTab === 'data' && <DataTable projection={projection} /> }
-            {activeTab === 'stress' && <StressTest config={config} setConfig={setConfig} />}
+            {activeTab === 'data' && <DataTable projection={projection} />}
+            {activeTab === 'settings' && <Settings config={config} setConfig={setConfig} />}
           </div>
         </main>
       </div>

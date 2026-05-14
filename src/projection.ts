@@ -1,4 +1,4 @@
-import type { AppConfig } from './config';
+import type { Config } from './config';
 
 export interface MonthlyData {
   age: number;
@@ -16,6 +16,7 @@ export interface MonthlyData {
   essentialSpending: number;
   discretionarySpending: number;
   insurance: number;
+  medicare: number;
   taxes: number;
   totalExpenses: number;
   
@@ -46,6 +47,7 @@ export interface YearlyData {
   totalEssentialSpending: number;
   totalDiscretionarySpending: number;
   totalInsurance: number;
+  totalMedicare: number;
   totalTaxes: number;
   totalExpenses: number;
   
@@ -79,13 +81,14 @@ export interface ProjectionResult {
   };
 }
 
-export function calculateProjection(config: AppConfig): ProjectionResult {
+export function calculateProjection(config: Config): ProjectionResult {
   let current403b = config.starting403b;
   let currentRoth = config.startingRoth;
   
   let currentPension = config.pensionStart;
   let currentEssentialSpending = config.essentialSpending;
   let currentDiscretionarySpending = config.discretionarySpending;
+  let currentMedicarePremium = config.medicarePremium;
   
   const yearlyData: YearlyData[] = [];
   
@@ -114,6 +117,7 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
       currentPension *= (1 + config.pensionCOLA);
       currentEssentialSpending *= (1 + config.spendingInflation);
       currentDiscretionarySpending *= (1 + config.spendingInflation);
+      currentMedicarePremium *= (1 + config.healthcareInflation);
     }
     
     const yearObj: YearlyData = {
@@ -127,6 +131,7 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
       totalEssentialSpending: 0,
       totalDiscretionarySpending: 0,
       totalInsurance: 0,
+      totalMedicare: 0,
       totalTaxes: 0,
       totalExpenses: 0,
       totalNetIncome: 0,
@@ -140,36 +145,36 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
     };
     
     for (let month = 0; month < 12; month++) {
-      // 0.5% growth applied to balances
-      current403b *= (1 + config.monthlyReturn);
-      currentRoth *= (1 + config.monthlyReturn);
+      // Monthly compounding
+      current403b *= (1 + (config.annualReturn / 12));
+      currentRoth *= (1 + (config.annualReturn / 12));
       
-      const pension = currentPension;
-      
-      // Wife works for specific years
-      const wifeSalary = year < config.wifeSalaryYears ? config.wifeSalary : 0;
+      const pension = currentPension / 12;
+      const wifeSalary = year < 2 ? config.wifeSalaryYears1_2 / 12 : 0; // Using wifeSalaryYears1_2 as the monthly salary for the first 2 years
       
       // Wife SS starts
-      const wifeSS = currentAge >= config.wifeSSStartAge ? config.wifeSS : 0;
+      const wifeSS = currentAge >= config.wifeSSStartAge ? config.wifeSS / 12 : 0;
       
       // Your SS starts
-      const yourSS = currentAge >= config.yourSSStartAge ? config.yourSS : 0;
+      const yourSS = currentAge >= config.yourSSStartAge ? config.yourSS / 12 : 0;
       
       const totalIncome = pension + wifeSalary + wifeSS + yourSS;
       
-      const essentialSpending = currentEssentialSpending;
-      const discretionarySpending = currentDiscretionarySpending;
+      const essentialSpending = currentEssentialSpending / 12;
+      const discretionarySpending = currentDiscretionarySpending / 12;
       // Insurance stops when you reach the end age
-      const insurance = currentAge < config.insuranceEndAge ? config.insurancePremium : 0;
+      const insurance = currentAge <= config.insuranceEndAge ? config.insurancePremium : 0;
+      // Medicare starts at age 65
+      const medicare = currentAge >= 65 ? currentMedicarePremium : 0;
       
       // Calculate taxes (Assume pension, salary, and SS are taxable for this estimate)
       // Note: In reality, SS taxation is complex (up to 85%), but we use effectiveTaxRate for a rough estimate
       const taxableIncomeEstimate = pension + wifeSalary + wifeSS + yourSS;
       const taxes = taxableIncomeEstimate * config.effectiveTaxRate;
       
-      const netIncome = totalIncome - taxes - insurance;
+      const netIncome = totalIncome - taxes - insurance - medicare;
       
-      const totalExpenses = essentialSpending + discretionarySpending + insurance + taxes;
+      const totalExpenses = essentialSpending + discretionarySpending + insurance + medicare + taxes;
       
       const gap = totalExpenses - totalIncome;
       
@@ -267,6 +272,7 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
         essentialSpending,
         discretionarySpending,
         insurance,
+        medicare,
         taxes: finalTaxes,
         totalExpenses: finalTotalExpenses,
         netIncome: finalNetIncome,
@@ -288,6 +294,7 @@ export function calculateProjection(config: AppConfig): ProjectionResult {
       yearObj.totalEssentialSpending += essentialSpending;
       yearObj.totalDiscretionarySpending += discretionarySpending;
       yearObj.totalInsurance += insurance;
+      yearObj.totalMedicare += medicare;
       yearObj.totalTaxes += finalTaxes;
       yearObj.totalExpenses += finalTotalExpenses;
       yearObj.totalNetIncome += finalNetIncome;

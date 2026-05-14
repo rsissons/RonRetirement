@@ -1,59 +1,56 @@
-export interface AppConfig {
-  retirementAge: number;
+export interface Config {
   projectionYears: number;
-  annualReturn: number;
-  monthlyReturn: number;
   
-  // Income
+  starting403b: number;
+  startingRoth: number;
+  
+  annualReturn: number;
+  
   pensionStart: number;
   pensionCOLA: number;
   
-  wifeSalary: number;
-  wifeSalaryYears: number; // How many years she works after you retire
+  wifeSalaryYears1_2: number;
   
   wifeSS: number;
-  wifeSSStartAge: number; // YOUR age when her SS starts
+  wifeSSStartAge: number;
   
   yourSS: number;
-  yourSSStartAge: number; // YOUR age when your SS starts
+  yourSSStartAge: number;
   
-  // Expenses
   essentialSpending: number;
   discretionarySpending: number;
   spendingInflation: number;
   
-  effectiveTaxRate: number; // e.g., 0.12 for 12% effective tax on taxable income
+  effectiveTaxRate: number;
   
-  rothExtraWithdrawal: number; // Discretionary annual Roth withdrawal
+  rothExtraWithdrawal: number;
   
   insurancePremium: number;
-  insuranceEndAge: number; // YOUR age when insurance stops (e.g. 60 meaning it covers age 60 and stops at 61, or 61 meaning it covers up to and including 61. If she is 4 years older, she hits 65 when you hit 61. So insurance stops when you hit 61. We'll say it covers you while age < 61).
+  insuranceEndAge: number;
+  medicarePremium: number; // New: Medicare costs after 65
+  healthcareInflation: number; // New: Healthcare specific inflation
   
-  // Assets
-  starting403b: number;
-  startingRoth: number;
+  retirementAge: number;
+  
   maxMonthlyConversion: number;
 }
 
-export const defaultConfig: AppConfig = {
-  retirementAge: 59,
+export const defaultConfig: Config = {
   projectionYears: 30,
-  annualReturn: 0.06,
-  monthlyReturn: 0.06 / 12,
   
-  // From CalPERS Estimate (100% Beneficiary Option)
-  pensionStart: 11441, 
+  starting403b: 136500,
+  startingRoth: 0,
+  
+  annualReturn: 0.06,
+  
+  pensionStart: 11441,
   pensionCOLA: 0.02,
   
-  // Wife works 1 year when you retire
-  wifeSalary: 4500,
-  wifeSalaryYears: 1, 
+  wifeSalaryYears1_2: 4500,
   
-  // Wife SS kicks in after 1 year (when you are 60)
   wifeSS: 1800,
   wifeSSStartAge: 60,
   
-  // Your SS kicks in at 62
   yourSS: 2250,
   yourSSStartAge: 62,
   
@@ -65,11 +62,12 @@ export const defaultConfig: AppConfig = {
   
   rothExtraWithdrawal: 0,
   
-  // Insurance stops when she is 65. If she's 4 years older, you are 61.
   insurancePremium: 888,
-  insuranceEndAge: 61, // Stops at 61 (so paid during 59 and 60)
+  insuranceEndAge: 61,
+  medicarePremium: 350, // Approx base Medicare B + Supplement for two
+  healthcareInflation: 0.05,
   
-  starting403b: 136500,
-  startingRoth: 0,
+  retirementAge: 59,
+  
   maxMonthlyConversion: 2500,
 };

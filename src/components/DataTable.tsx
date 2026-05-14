@@ -47,13 +47,13 @@ export const DataTable: FC<Props> = ({ projection }) => {
                 <th className="px-4 py-3">Wife SS</th>
                 <th className="px-4 py-3">Your SS</th>
                 <th className="px-4 py-3">Insurance</th>
-                <th className="px-4 py-3 text-red-700">Taxes</th>
-                <th className="px-4 py-3 font-bold">Net Income</th>
+                <th className="px-4 py-3 text-[#D55E00]">Taxes</th>
+                <th className="px-4 py-3 font-bold text-[#009E73]">Net Income</th>
                 <th className="px-4 py-3">Essential</th>
                 <th className="px-4 py-3">Discretionary</th>
-                <th className="px-4 py-3 text-red-600">Surplus/Shortfall</th>
-                <th className="px-4 py-3 text-blue-600">403b End</th>
-                <th className="px-4 py-3 text-purple-600">Roth End</th>
+                <th className="px-4 py-3 text-[#D55E00]">Surplus/Shortfall</th>
+                <th className="px-4 py-3 text-[#56B4E9]">403b End</th>
+                <th className="px-4 py-3 text-[#0072B2]">Roth End</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -65,15 +65,15 @@ export const DataTable: FC<Props> = ({ projection }) => {
                   <td className="px-4 py-3">{formatCurrency(y.totalWifeSS)}</td>
                   <td className="px-4 py-3">{formatCurrency(y.totalYourSS)}</td>
                   <td className="px-4 py-3">{formatCurrency(y.totalInsurance)}</td>
-                  <td className="px-4 py-3 text-red-700">{formatCurrency(y.totalTaxes)}</td>
-                  <td className="px-4 py-3 font-bold bg-green-50/50">{formatCurrency(y.totalNetIncome)}</td>
+                  <td className="px-4 py-3 text-[#D55E00]">{formatCurrency(y.totalTaxes)}</td>
+                  <td className="px-4 py-3 font-bold bg-[#009E73]/10 text-[#009E73]">{formatCurrency(y.totalNetIncome)}</td>
                   <td className="px-4 py-3">{formatCurrency(y.totalEssentialSpending)}</td>
                   <td className="px-4 py-3">{formatCurrency(y.totalDiscretionarySpending)}</td>
-                  <td className={`px-4 py-3 font-medium ${y.totalGap > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                  <td className={`px-4 py-3 font-medium ${y.totalGap > 0 ? 'text-[#D55E00]' : 'text-[#009E73]'}`}>
                     {y.totalGap > 0 ? formatCurrency(y.totalGap) : formatCurrency(-y.totalGap)}
                   </td>
-                  <td className="px-4 py-3 font-medium text-blue-600">{formatCurrency(y.endBalance403b)}</td>
-                  <td className="px-4 py-3 font-medium text-purple-600">{formatCurrency(y.endBalanceRoth)}</td>
+                  <td className="px-4 py-3 font-medium text-[#56B4E9]">{formatCurrency(y.endBalance403b)}</td>
+                  <td className="px-4 py-3 font-medium text-[#0072B2]">{formatCurrency(y.endBalanceRoth)}</td>
                 </tr>
               ))}
               
@@ -85,15 +85,15 @@ export const DataTable: FC<Props> = ({ projection }) => {
                   <td className="px-4 py-3">{formatCurrency(m.wifeSS)}</td>
                   <td className="px-4 py-3">{formatCurrency(m.yourSS)}</td>
                   <td className="px-4 py-3">{formatCurrency(m.insurance)}</td>
-                  <td className="px-4 py-3 text-red-700">{formatCurrency(m.taxes)}</td>
-                  <td className="px-4 py-3 font-bold bg-green-50/50">{formatCurrency(m.netIncome)}</td>
+                  <td className="px-4 py-3 text-[#D55E00]">{formatCurrency(m.taxes)}</td>
+                  <td className="px-4 py-3 font-bold bg-[#009E73]/10 text-[#009E73]">{formatCurrency(m.netIncome)}</td>
                   <td className="px-4 py-3">{formatCurrency(m.essentialSpending)}</td>
                   <td className="px-4 py-3">{formatCurrency(m.discretionarySpending)}</td>
-                  <td className={`px-4 py-3 font-medium ${m.gap > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                  <td className={`px-4 py-3 font-medium ${m.gap > 0 ? 'text-[#D55E00]' : 'text-[#009E73]'}`}>
                     {m.gap > 0 ? formatCurrency(m.gap) : formatCurrency(-m.gap)}
                   </td>
-                  <td className="px-4 py-3 font-medium text-blue-600">{formatCurrency(m.balance403b)}</td>
-                  <td className="px-4 py-3 font-medium text-purple-600">{formatCurrency(m.balanceRoth)}</td>
+                  <td className="px-4 py-3 font-medium text-[#56B4E9]">{formatCurrency(m.balance403b)}</td>
+                  <td className="px-4 py-3 font-medium text-[#0072B2]">{formatCurrency(m.balanceRoth)}</td>
                 </tr>
               ))}
             </tbody>
