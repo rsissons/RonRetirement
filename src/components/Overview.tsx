@@ -107,7 +107,8 @@ export const Overview: FC<Props> = ({ config, projection }) => {
         
         {/* Panel 1: Benchmarks */}
         <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200">
-          <h3 className="text-lg font-bold text-[#1a365d] mb-6">Retirement Benchmarks</h3>
+          <h3 className="text-lg font-bold text-[#1a365d] mb-1">Retirement Benchmarks</h3>
+          <p className="text-xs text-gray-400 mb-4">Based on Year 1 projections (Age {firstYear.age})</p>
           
           <div className="mb-6">
             <div className="flex justify-between text-xs font-bold text-[#1a365d] mb-1">
@@ -130,8 +131,8 @@ export const Overview: FC<Props> = ({ config, projection }) => {
 
           <div className="mb-6">
             <div className="flex justify-between text-xs font-bold text-[#1a365d] mb-1">
-              <span title="First year withdrawals divided by total liquid assets">Safe Withdrawal Rate</span>
-              <span className="text-gray-400">Benchmark: 4%</span>
+              <span title="Year 1 account withdrawals ÷ starting liquid assets. 0% means income fully covers expenses — no account withdrawals needed.">Safe Withdrawal Rate</span>
+              <span className="text-gray-400">Target: &lt;4%</span>
             </div>
             <div className="flex items-center space-x-3">
                <div className="flex-1 h-4 bg-gray-200 relative">
@@ -141,16 +142,19 @@ export const Overview: FC<Props> = ({ config, projection }) => {
                 ></div>
                 <div className="absolute top-0 bottom-0 border-r-2 border-gray-400" style={{ left: '40%' }}></div>
               </div>
-               <span className={`font-bold w-12 text-right`} style={{ color: projection.metrics.safeWithdrawalRate <= 4 ? C_SUCCESS : C_DANGER }}>
-                  {projection.metrics.safeWithdrawalRate.toFixed(1)}%
+               <span className={`font-bold w-16 text-right text-sm`} style={{ color: C_SUCCESS }}>
+                  {projection.metrics.safeWithdrawalRate === 0 ? '✓ 0%' : `${projection.metrics.safeWithdrawalRate.toFixed(1)}%`}
                </span>
             </div>
+            {projection.metrics.safeWithdrawalRate === 0 && (
+              <p className="text-[10px] text-[#009E73] mt-1">✓ Excellent — Year 1 income fully covers all expenses. No account withdrawals needed.</p>
+            )}
           </div>
 
           <div>
             <div className="flex justify-between text-xs font-bold text-[#1a365d] mb-1">
               <span>Debt to Asset Ratio</span>
-              <span className="text-gray-400">Benchmark: 20%</span>
+              <span className="text-gray-400">Target: &lt;20%</span>
             </div>
             <div className="flex items-center space-x-3">
                <div className="flex-1 h-4 bg-gray-200 relative">
@@ -159,6 +163,7 @@ export const Overview: FC<Props> = ({ config, projection }) => {
               </div>
                <span className="font-bold w-12 text-right" style={{ color: C_SUCCESS }}>0%</span>
             </div>
+            <p className="text-[10px] text-[#009E73] mt-1">✓ No liabilities modeled. Add mortgage/debt in Settings if applicable.</p>
           </div>
         </div>
 
@@ -187,9 +192,10 @@ export const Overview: FC<Props> = ({ config, projection }) => {
         <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200">
           <div className="flex justify-between items-end mb-4">
             <h3 className="text-lg font-bold text-[#1a365d] leading-tight w-1/2">
-              Annual Income <br/> vs. Expenses <br/>
+              Annual Income <br/> vs. Expenses
+              <span className="block text-xs font-normal text-gray-400 mb-1">Year 1 · Age {firstYear.age} · {config.yourRetirementDate.slice(0,4)}</span>
               <span className="text-2xl" style={{ color: annualIncome >= annualExpenses ? C_SUCCESS : C_DANGER }}>
-                {formatCurrency(annualIncome - annualExpenses)}
+                {annualIncome >= annualExpenses ? '+' : '-'}{formatCurrency(Math.abs(annualIncome - annualExpenses))}
               </span>
             </h3>
           </div>
@@ -220,9 +226,10 @@ export const Overview: FC<Props> = ({ config, projection }) => {
         <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200">
           <div className="flex justify-between items-end mb-4">
             <h3 className="text-lg font-bold text-[#1a365d] leading-tight w-1/2">
-              Monthly Income <br/> vs. Expenses <br/>
+              Monthly Income <br/> vs. Expenses
+              <span className="block text-xs font-normal text-gray-400 mb-1">Month 1 · Age {firstYear.age} · {config.yourRetirementDate.slice(0,4)}</span>
               <span className="text-2xl" style={{ color: monthlyIncome >= monthlyExpenses ? C_SUCCESS : C_DANGER }}>
-                {formatCurrency(monthlyIncome - monthlyExpenses)}
+                {monthlyIncome >= monthlyExpenses ? '+' : '-'}{formatCurrency(Math.abs(monthlyIncome - monthlyExpenses))}
               </span>
             </h3>
           </div>
@@ -284,7 +291,8 @@ export const Overview: FC<Props> = ({ config, projection }) => {
         {/* Panel 7: Net Worth */}
         <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200 flex flex-col justify-between">
            <div>
-              <h3 className="text-lg font-bold text-[#1a365d] mb-2">Net Worth</h3>
+              <h3 className="text-lg font-bold text-[#1a365d] mb-1">Net Worth</h3>
+              <p className="text-xs text-gray-400 mb-2">Liquid assets at start of retirement · {config.yourRetirementDate}</p>
               <p className="text-3xl font-bold mb-6" style={{ color: C_SUCCESS }}>{formatCurrency(totalAssets)}</p>
            </div>
            
@@ -372,7 +380,8 @@ export const Overview: FC<Props> = ({ config, projection }) => {
 
         {/* Panel 10: Buckets */}
         <div className="bg-white p-6 rounded-sm shadow-sm border border-gray-200">
-           <h3 className="text-lg font-bold text-[#1a365d] mb-8" title="Projected shortfalls across 3-year horizons">Buckets</h3>
+           <h3 className="text-lg font-bold text-[#1a365d] mb-1">Spending Buckets</h3>
+           <p className="text-xs text-gray-400 mb-4">Projected cumulative shortfalls by time horizon. The Growth bucket is your remaining investable balance beyond the first 9 years of shortfalls.</p>
            
            <div className="flex justify-between items-end h-32 px-4 space-x-2">
               
