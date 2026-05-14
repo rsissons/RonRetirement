@@ -178,21 +178,33 @@ export function calculateProjection(config: Config): ProjectionResult {
       // Medicare starts at age 65
       const medicare = currentAge >= 65 ? currentMedicarePremium : 0;
       
-      // Calculate taxes (Assume pension, salary, and SS are taxable for this estimate)
-      // Note: In reality, SS taxation is complex (up to 85%), but we use effectiveTaxRate for a rough estimate
+      // Income taxes on guaranteed income
       const taxableIncomeEstimate = pension + wifeSalary + wifeSS + yourSS;
-      const taxes = taxableIncomeEstimate * config.effectiveTaxRate;
+      const incomeTaxes = taxableIncomeEstimate * config.effectiveTaxRate;
       
-      const netIncome = totalIncome - taxes - insurance - medicare;
-      
-      const totalExpenses = essentialSpending + discretionarySpending + insurance + medicare + taxes;
-      
-      const gap = totalExpenses - totalIncome;
-      
+      // --- Step 1: Do Roth conversion FIRST so we know all costs ---
       let withdrawal403b = 0;
       let withdrawalRoth = 0;
       let conversionToRoth = 0;
+
+      if (current403b > 0) {
+        conversionToRoth = Math.min(current403b, config.maxMonthlyConversion);
+        current403b -= conversionToRoth;
+        currentRoth += conversionToRoth;
+      }
+
+      // Tax on conversion (comes out of pocket — treated as expense)
+      const conversionTaxes = conversionToRoth * config.effectiveTaxRate;
+
+      // --- Step 2: Now compute the REAL total taxes and gap ---
+      const totalTaxes = incomeTaxes + conversionTaxes;
+      const totalExpenses = essentialSpending + discretionarySpending + insurance + medicare + totalTaxes;
+      const netIncome = totalIncome - totalTaxes - insurance - medicare;
       
+      // Gap = what income DOESN'T cover. Positive = shortfall, negative = surplus
+      const gap = totalExpenses - totalIncome;
+      
+      // --- Step 3: Cover any shortfall from 403b first, then Roth ---
       let remainingGap = gap > 0 ? gap : 0;
       
       if (current403b > 0 && remainingGap > 0) {
@@ -230,19 +242,6 @@ export function calculateProjection(config: Config): ProjectionResult {
         withdrawalRoth += currentRoth;
         currentRoth = 0;
       }
-      
-      if (current403b > 0) {
-        conversionToRoth = Math.min(current403b, config.maxMonthlyConversion);
-        current403b -= conversionToRoth;
-        currentRoth += conversionToRoth;
-      }
-      
-      // Tax on 403b withdrawal and conversion
-      const additionalTaxes = (withdrawal403b + conversionToRoth) * config.effectiveTaxRate;
-      // We'll just add this to the total taxes and expenses for accurate tracking
-      const finalTaxes = taxes + additionalTaxes;
-      const finalTotalExpenses = totalExpenses + additionalTaxes;
-      const finalNetIncome = netIncome - additionalTaxes;
       
       if (current403b === 0 && withdrawal403b > 0 && year403bDepleted === null) {
         year403bDepleted = currentAge;
@@ -284,9 +283,9 @@ export function calculateProjection(config: Config): ProjectionResult {
         discretionarySpending,
         insurance,
         medicare,
-        taxes: finalTaxes,
-        totalExpenses: finalTotalExpenses,
-        netIncome: finalNetIncome,
+        taxes: totalTaxes,
+        totalExpenses,
+        netIncome,
         gap,
         withdrawal403b,
         withdrawalRoth,
@@ -306,9 +305,9 @@ export function calculateProjection(config: Config): ProjectionResult {
       yearObj.totalDiscretionarySpending += discretionarySpending;
       yearObj.totalInsurance += insurance;
       yearObj.totalMedicare += medicare;
-      yearObj.totalTaxes += finalTaxes;
-      yearObj.totalExpenses += finalTotalExpenses;
-      yearObj.totalNetIncome += finalNetIncome;
+      yearObj.totalTaxes += totalTaxes;
+      yearObj.totalExpenses += totalExpenses;
+      yearObj.totalNetIncome += netIncome;
       yearObj.totalGap += gap;
       yearObj.totalWithdrawal403b += withdrawal403b;
       yearObj.totalWithdrawalRoth += withdrawalRoth;
