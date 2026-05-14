@@ -1,5 +1,5 @@
-import React from 'react';
-import { ProjectionResult } from '../projection';
+import type { FC } from 'react';
+import type { ProjectionResult } from '../projection';
 import { Wallet, TrendingDown, TrendingUp, PiggyBank, Landmark } from 'lucide-react';
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 const formatCurrency = (value: number) => 
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 
-export const Overview: React.FC<Props> = ({ projection }) => {
+export const Overview: FC<Props> = ({ projection }) => {
   const firstYear = projection.yearly[0];
   const firstMonth = firstYear.months[0];
   

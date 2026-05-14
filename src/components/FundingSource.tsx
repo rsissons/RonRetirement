@@ -1,12 +1,12 @@
-import React from 'react';
-import { ProjectionResult } from '../projection';
+import type { FC } from 'react';
+import type { ProjectionResult } from '../projection';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface Props {
   projection: ProjectionResult;
 }
 
-export const FundingSource: React.FC<Props> = ({ projection }) => {
+export const FundingSource: FC<Props> = ({ projection }) => {
   const data = projection.yearly.map(y => ({
     age: y.age,
     '403b Withdrawals': y.totalWithdrawal403b,
@@ -30,7 +30,7 @@ export const FundingSource: React.FC<Props> = ({ projection }) => {
               axisLine={false} 
               tick={{ fill: '#6b7280' }} 
             />
-            <Tooltip formatter={(value: number) => formatCurrency(value)} />
+            <Tooltip formatter={(value: any) => formatCurrency(value)} />
             <Legend />
             <Area type="monotone" dataKey="403b Withdrawals" stackId="1" stroke="#3b82f6" fill="#93c5fd" />
             <Area type="monotone" dataKey="Roth Withdrawals" stackId="1" stroke="#8b5cf6" fill="#c4b5fd" />

@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { defaultConfig, AppConfig } from './config';
+import { useState, useMemo } from 'react';
+import { defaultConfig } from './config';
+import type { AppConfig } from './config';
 import { calculateProjection } from './projection';
 import { Overview } from './components/Overview';
 import { IncomeBreakdown } from './components/IncomeBreakdown';

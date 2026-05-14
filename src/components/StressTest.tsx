@@ -1,13 +1,13 @@
-import React from 'react';
-import { AppConfig } from '../config';
+import type { FC, Dispatch, SetStateAction, ChangeEvent } from 'react';
+import type { AppConfig } from '../config';
 
 interface Props {
   config: AppConfig;
-  setConfig: React.Dispatch<React.SetStateAction<AppConfig>>;
+  setConfig: Dispatch<SetStateAction<AppConfig>>;
 }
 
-export const StressTest: React.FC<Props> = ({ config, setConfig }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+export const StressTest: FC<Props> = ({ config, setConfig }) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     let numValue = parseFloat(value);
     

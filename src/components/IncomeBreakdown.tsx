@@ -1,12 +1,12 @@
-import React from 'react';
-import { ProjectionResult } from '../projection';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Line, ComposedChart } from 'recharts';
+import type { FC } from 'react';
+import type { ProjectionResult } from '../projection';
+import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Line, ComposedChart } from 'recharts';
 
 interface Props {
   projection: ProjectionResult;
 }
 
-export const IncomeBreakdown: React.FC<Props> = ({ projection }) => {
+export const IncomeBreakdown: FC<Props> = ({ projection }) => {
   const data = projection.yearly.map(y => ({
     age: y.age,
     Pension: y.totalPension,
@@ -33,7 +33,7 @@ export const IncomeBreakdown: React.FC<Props> = ({ projection }) => {
               axisLine={false} 
               tick={{ fill: '#6b7280' }} 
             />
-            <Tooltip formatter={(value: number) => formatCurrency(value)} />
+            <Tooltip formatter={(value: any) => formatCurrency(value)} />
             <Legend />
             <Bar dataKey="Pension" stackId="a" fill="#3b82f6" radius={[0, 0, 4, 4]} />
             <Bar dataKey="Wife Salary" stackId="a" fill="#10b981" />

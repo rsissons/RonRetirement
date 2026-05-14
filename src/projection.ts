@@ -1,4 +1,4 @@
-import { AppConfig } from './config';
+import type { AppConfig } from './config';
 
 export interface MonthlyData {
   age: number;
