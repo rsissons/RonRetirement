@@ -192,7 +192,7 @@ export function calculateProjection(config: Config): ProjectionResult {
       const taxableIncomeEstimate = pension + wifeSalary + wifeSS + yourSS;
       const incomeTaxes = taxableIncomeEstimate * config.effectiveTaxRate;
       
-      // --- Step 1: Do Roth conversion FIRST so we know all costs ---
+      // --- Step 1: Roth conversion (account TRANSFER, NOT spending) ---
       let withdrawal403b = 0;
       let withdrawalRoth = 0;
       let conversionToRoth = 0;
@@ -203,15 +203,22 @@ export function calculateProjection(config: Config): ProjectionResult {
         currentRoth += conversionToRoth;
       }
 
-      // Tax on conversion (comes out of pocket — treated as expense)
+      // Conversion taxes: real IRS cost, but NOT living expenses.
+      // Deducted directly from 403b (separate from spending gap).
       const conversionTaxes = conversionToRoth * config.effectiveTaxRate;
+      if (conversionTaxes > 0) {
+        if (current403b >= conversionTaxes) {
+          current403b -= conversionTaxes;
+        } else if (currentRoth >= conversionTaxes) {
+          currentRoth -= conversionTaxes;
+        }
+      }
 
-      // --- Step 2: Now compute the REAL total taxes and gap ---
-      const totalTaxes = incomeTaxes + conversionTaxes;
-      const totalExpenses = essentialSpending + discretionarySpending + insurance + medicare + totalTaxes;
-      const netIncome = totalIncome - totalTaxes - insurance - medicare;
-      
-      // Gap = what income DOESN'T cover. Positive = shortfall, negative = surplus
+      // --- Step 2: Total Spend = REAL living expenses only (no conversion costs) ---
+      const totalExpenses = essentialSpending + discretionarySpending + insurance + medicare + incomeTaxes;
+      const netIncome = totalIncome - incomeTaxes - insurance - medicare;
+
+      // Gap: income vs real living expenses only
       const gap = totalExpenses - totalIncome;
       
       // --- Step 3: Cover any shortfall from 403b first, then Roth ---
@@ -295,7 +302,7 @@ export function calculateProjection(config: Config): ProjectionResult {
         medicare,
         incomeTaxes,
         conversionTaxes,
-        taxes: totalTaxes,
+        taxes: incomeTaxes + conversionTaxes,
         totalExpenses,
         netIncome,
         gap,
@@ -319,7 +326,7 @@ export function calculateProjection(config: Config): ProjectionResult {
       yearObj.totalMedicare += medicare;
       yearObj.totalIncomeTaxes += incomeTaxes;
       yearObj.totalConversionTaxes += conversionTaxes;
-      yearObj.totalTaxes += totalTaxes;
+      yearObj.totalTaxes += incomeTaxes + conversionTaxes;
       yearObj.totalExpenses += totalExpenses;
       yearObj.totalNetIncome += netIncome;
       yearObj.totalGap += gap;
