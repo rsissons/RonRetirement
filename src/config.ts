@@ -62,7 +62,7 @@ export const defaultConfig: Config = {
 
   essentialSpending: 10000,
   discretionarySpending: 3000,
-  spendingInflation: 0.03,
+  spendingInflation: 0.02,
 
   effectiveTaxRate: 0.12,
 
