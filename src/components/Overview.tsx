@@ -48,7 +48,6 @@ export const Overview: FC<Props> = ({ config, projection }) => {
   const fundedThrough = depletionYear ? `Age ${depletionYear.age}` : `Age ${last.age}+`;
 
   // Monthly budget
-  const monthlyIncome = m1.totalIncome;
   const monthlyNet = m1.netIncome;
   const monthlySpend = m1.essentialSpending + m1.discretionarySpending;
   const surplus = monthlyNet - monthlySpend;
