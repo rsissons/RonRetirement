@@ -50,8 +50,8 @@ export const Overview: FC<Props> = ({ config, projection }) => {
   // Monthly budget
   const monthlyIncome = m1.totalIncome;
   const monthlyNet = m1.netIncome;
-  const monthlySpend = m1.totalExpenses;
-  const surplus = monthlyIncome - monthlySpend;
+  const monthlySpend = m1.essentialSpending + m1.discretionarySpending;
+  const surplus = monthlyNet - monthlySpend;
 
   // Pension at 30 yrs (with COLA)
   const pensionAt30 = y1.totalPension * Math.pow(1 + config.pensionCOLA, 29) / 12;
@@ -167,11 +167,11 @@ export const Overview: FC<Props> = ({ config, projection }) => {
           <p className="text-xs text-gray-400 mb-3">Age {y1.age} · {config.yourRetirementDate.slice(0,4)} · Income vs. Spending</p>
           <div className="grid grid-cols-2 gap-3 mb-3">
             <div className="rounded p-3 border-l-4" style={{ borderColor: C.green, background: '#f0fdf4' }}>
-              <p className="text-[10px] text-gray-500 uppercase">Total Monthly Income</p>
-              <p className="text-xl font-bold" style={{ color: C.green }}>{$(monthlyIncome)}</p>
+              <p className="text-[10px] text-gray-500 uppercase">Net Monthly Income</p>
+              <p className="text-xl font-bold" style={{ color: C.green }}>{$(monthlyNet)}</p>
             </div>
             <div className="rounded p-3 border-l-4" style={{ borderColor: C.orange, background: '#fff7ed' }}>
-              <p className="text-[10px] text-gray-500 uppercase">Total Monthly Spending</p>
+              <p className="text-[10px] text-gray-500 uppercase">Total Monthly Spend</p>
               <p className="text-xl font-bold" style={{ color: C.orange }}>{$(monthlySpend)}</p>
             </div>
           </div>
