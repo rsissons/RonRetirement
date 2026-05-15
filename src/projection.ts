@@ -98,6 +98,8 @@ export function calculateProjection(config: Config): ProjectionResult {
   // All config spending/income values are MONTHLY figures.
   // currentPension tracks the monthly pension amount, inflated by COLA each year.
   let currentPension = config.pensionStart;
+  let currentWifeSS = config.wifeSS;
+  let currentYourSS = config.yourSS;
   let currentEssentialSpending = config.essentialSpending;
   let currentDiscretionarySpending = config.discretionarySpending;
   let currentMedicarePremium = config.medicarePremium;
@@ -127,6 +129,8 @@ export function calculateProjection(config: Config): ProjectionResult {
     // Annual COLA/Inflation applied at the start of each new year
     if (year > 0) {
       currentPension *= (1 + config.pensionCOLA);
+      currentWifeSS *= (1 + config.pensionCOLA);
+      currentYourSS *= (1 + config.pensionCOLA);
       currentEssentialSpending *= (1 + config.spendingInflation);
       currentDiscretionarySpending *= (1 + config.spendingInflation);
       currentMedicarePremium *= (1 + config.healthcareInflation);
@@ -173,10 +177,10 @@ export function calculateProjection(config: Config): ProjectionResult {
       const wifeSalary = wifeCurrentAge < config.wifeRetirementAge ? config.wifeSalary : 0;
       
       // Wife SS: starts exactly when she retires (same age as salary ends — no overlap)
-      const wifeSS = wifeCurrentAge >= config.wifeRetirementAge ? config.wifeSS : 0;
+      const wifeSS = wifeCurrentAge >= config.wifeRetirementAge ? currentWifeSS : 0;
       
       // Your SS starts (monthly amount from config)
-      const yourSS = currentAge >= config.yourSSStartAge ? config.yourSS : 0;
+      const yourSS = currentAge >= config.yourSSStartAge ? currentYourSS : 0;
       
       const totalIncome = pension + wifeSalary + wifeSS + yourSS;
       

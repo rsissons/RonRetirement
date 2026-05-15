@@ -71,7 +71,7 @@ export const defaultConfig: Config = {
   insurancePremium: 888,          // Wife's private insurance until she's 65
   wifeInsuranceEndAge: 65,        // Wife goes on Medicare at 65; Ron covered by CalPERS forever
   medicarePremium: 174,           // Wife's Medicare Part B only (~$174/mo 2024); Ron = $0
-  healthcareInflation: 0.05,
+  healthcareInflation: 0.031,
 
   retirementAge: 59,
   yourRetirementDate: '2029-10-31',
