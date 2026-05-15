@@ -232,15 +232,19 @@ export const Overview: FC<Props> = ({ config, projection }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
         {/* Key Milestones */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
-          <h3 className="text-base font-bold text-[#15325b] mb-3">📅 Key Milestones</h3>
-          <div className="space-y-2">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <h3 className="text-lg font-bold text-[#15325b] mb-5 flex items-center gap-2">
+            <span>📅</span> Key Milestones
+          </h3>
+          <div className="space-y-4">
             {milestones.map((m, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div className="mt-0.5 shrink-0 w-10 text-center">
-                  <span className="text-xs font-bold rounded px-1.5 py-0.5 text-white" style={{ background: C.navy }}>Age {m.age}</span>
+              <div key={i} className="flex items-start gap-4 group">
+                <div className="shrink-0 pt-0.5">
+                  <span className="inline-block text-[10px] font-bold rounded-full px-2.5 py-1 text-white whitespace-nowrap shadow-sm" style={{ background: C.navy }}>
+                    Age {m.age}
+                  </span>
                 </div>
-                <p className="text-sm text-gray-700">{m.label}</p>
+                <p className="text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">{m.label}</p>
               </div>
             ))}
           </div>
