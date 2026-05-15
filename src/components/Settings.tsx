@@ -194,7 +194,7 @@ export const Settings: FC<Props> = ({ config, setConfig }) => {
               <span className="font-bold text-[#D55E00]">${config.medicarePremium}</span>
             </label>
             <input type="range" name="medicarePremium" min="0" max="600" step="5" value={config.medicarePremium} onChange={handleChange} className="w-full accent-[#D55E00]" />
-            <p className="text-xs text-gray-400 mt-1">Wife's Medicare Part B only. Ron = $0 (CalPERS covers him).</p>
+            <p className="text-xs text-gray-400 mt-1">Wife's Medicare Part B + Supplemental. Ron = $0 (CalPERS covers him).</p>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
